@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineStore - Catálogo & Loja de Filmes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            200: '#c7d2fe',
+                            300: '#a5b4fc',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
+                            950: '#1e1b4b',
+                        },
+                        cyan: {
+                            400: '#38bdf8',
+                            500: '#06b6d4',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Supabase JS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .glass-panel {
+            background: rgba(13, 18, 36, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-card {
+            background: rgba(22, 30, 56, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+        }
+    </style>
+</head>
+<body class="bg-[#070b14] text-slate-100 min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-white antialiased">
+
+    <header class="sticky top-0 z-40 glass-panel border-b border-indigo-950/60">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer group" onclick="navigateTo('home')">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 via-indigo-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-brand-500/25 group-hover:scale-105 transition">
+                    <i class="fa-solid fa-clapperboard text-white text-xs"></i>
+                </div>
+                <div>
+                    <span class="text-base font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text text-transparent">CineStore</span>
+                    <span class="block text-[8px] text-cyan-400 font-bold uppercase tracking-widest flex items-center space-x-1">
+                        <span class="w-1 h-1 rounded-full bg-cyan-400 mr-1 animate-pulse"></span>
+                        PIX 4K Instantâneo
+                    </span>
+                </div>
+            </div>
+
+            <div class="hidden md:flex items-center space-x-6 text-xs font-semibold">
+                <button onclick="navigateTo('home')" class="hover:text-brand-400 transition">Início</button>
+                <button onclick="filterCategory('all')" class="hover:text-brand-400 transition">Catálogo</button>
+                <button onclick="showMyLibrary()" class="hover:text-brand-400 transition flex items-center space-x-1.5">
+                    <i class="fa-solid fa-film text-xs text-brand-500"></i>
+                    <span>Meus Filmes</span>
+                </button>
+                <button onclick="scrollToHowItWorks()" class="hover:text-brand-400 transition flex items-center space-x-1.5 text-slate-300">
+                    <i class="fa-solid fa-circle-question text-xs text-amber-400"></i>
+                    <span>Como Comprar</span>
+                </button>
+                <button onclick="openSupportModal()" class="hover:text-brand-400 transition flex items-center space-x-1.5 text-slate-300">
+                    <i class="fa-solid fa-headset text-xs text-emerald-400"></i>
+                    <span>Suporte</span>
+                </button>
+            </div>
+
+            <div class="flex items-center space-x-2.5">
+                <div class="relative hidden sm:block">
+                    <input type="text" id="searchInput" oninput="handleSearch(this.value)" placeholder="Pesquisar..." class="bg-slate-900/90 text-xs rounded-xl pl-9 pr-3 py-2 w-40 lg:w-52 focus:outline-none focus:ring-2 focus:ring-brand-500 border border-slate-800 transition">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                </div>
+                <button onclick="toggleCartModal()" class="relative p-2 rounded-xl glass-card hover:bg-slate-800 transition group">
+                    <i class="fa-solid fa-bag-shopping text-slate-300 group-hover:text-brand-400 transition text-sm"></i>
+                    <span id="cartBadge" class="absolute -top-1 -right-1 bg-brand-600 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-extrabold shadow-md hidden">0</span>
+                </button>
+            </div>
+        </div>
+        <div class="px-4 pb-3 sm:hidden">
+            <div class="relative w-full">
+                <input type="text" oninput="handleSearch(this.value)" placeholder="Pesquisar filmes..." class="bg-slate-900/90 text-xs rounded-xl pl-9 pr-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-brand-500 border border-slate-800">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full space-y-6">
+        
+        <!-- Hero Section -->
+        <section id="heroSection" class="relative rounded-2xl overflow-hidden glass-panel border border-slate-800/80 p-5 sm:p-8 md:p-10 shadow-xl min-h-[300px] flex flex-col justify-end">
+            <div id="heroBg" class="absolute inset-0 opacity-20 bg-cover bg-center transition-all duration-700"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent"></div>
+            <div class="relative z-10 max-w-lg" id="heroContent">
+                <span class="inline-block px-3 py-1 rounded-full bg-brand-500/10 text-brand-400 border border-brand-500/30 text-[10px] font-bold uppercase tracking-wider mb-2">
+                    Destaque TMDB 4K
+                </span>
+                <h1 id="heroTitle" class="text-xl sm:text-3xl font-extrabold tracking-tight mb-2 text-white">Carregando...</h1>
+                <p id="heroDesc" class="text-slate-300 text-xs sm:text-sm mb-4 leading-relaxed line-clamp-2">Buscando os melhores lançamentos em tempo real...</p>
+                <div class="flex flex-wrap gap-2.5" id="heroButtons"></div>
+            </div>
+        </section>
+
+        <!-- How It Works Section (Como Funciona em 3 Passos - Carrossel no Mobile) -->
+        <section id="howItWorksSection" class="p-4 sm:p-7 rounded-2xl glass-panel border border-slate-800/80 shadow-lg">
+            <div class="flex items-center justify-between pb-3.5 border-b border-slate-800/80 mb-4 gap-2">
+                <div>
+                    <span class="text-[10px] uppercase font-extrabold text-brand-400 tracking-wider">Passo a Passo Simples</span>
+                    <h2 class="text-sm sm:text-lg font-black text-white">Como comprar e assistir?</h2>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="text-[10px] text-slate-400 font-medium sm:hidden flex items-center space-x-1 bg-slate-900/80 px-2 py-1 rounded-lg border border-slate-800">
+                        <span>Deslize</span>
+                        <i class="fa-solid fa-arrow-right text-[8px] text-cyan-400"></i>
+                    </span>
+                    <button onclick="openSupportModal()" class="px-3 py-1.5 rounded-xl glass-card hover:bg-slate-800 text-slate-300 hover:text-white text-xs font-semibold hidden sm:flex items-center space-x-1.5 transition">
+                        <i class="fa-solid fa-headset text-emerald-400 text-xs"></i>
+                        <span>Precisa de Ajuda?</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Carousel Container (Horizontal no mobile, Grid de 3 no Desktop) -->
+            <div class="flex overflow-x-auto hide-scrollbar gap-3 pb-1 snap-x snap-mandatory md:grid md:grid-cols-3 md:gap-4 md:overflow-visible">
+                
+                <!-- Step 1 -->
+                <div class="min-w-[84%] sm:min-w-[70%] md:min-w-0 snap-start flex-shrink-0 md:flex-shrink p-4 rounded-2xl glass-card border border-slate-800/80 flex flex-col justify-between hover:border-brand-500/40 transition">
+                    <div class="space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <div class="w-9 h-9 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-400 font-black text-sm">
+                                1
+                            </div>
+                            <span class="text-[9px] text-slate-500 uppercase font-bold sm:hidden">Etapa 1 de 3</span>
+                        </div>
+                        <h3 class="font-extrabold text-sm text-white flex items-center space-x-2">
+                            <span>Escolha o Filme</span>
+                            <i class="fa-solid fa-film text-brand-400 text-xs"></i>
+                        </h3>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            Navegue pelo catálogo com milhares de lançamentos em <strong class="text-white">4K Ultra HD</strong> e adicione ao carrinho.
+                        </p>
+                    </div>
+                    <div class="mt-3 text-[10px] text-slate-500 font-medium">Sem assinaturas fixas</div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="min-w-[84%] sm:min-w-[70%] md:min-w-0 snap-start flex-shrink-0 md:flex-shrink p-4 rounded-2xl glass-card border border-slate-800/80 flex flex-col justify-between hover:border-emerald-500/40 transition">
+                    <div class="space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <div class="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-black text-sm">
+                                2
+                            </div>
+                            <span class="text-[9px] text-emerald-400/80 uppercase font-bold sm:hidden">Etapa 2 de 3</span>
+                        </div>
+                        <h3 class="font-extrabold text-sm text-white flex items-center space-x-2">
+                            <span>Pague com PIX</span>
+                            <i class="fa-solid fa-bolt text-emerald-400 text-xs"></i>
+                        </h3>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            <strong class="text-emerald-400">Zero formulários!</strong> Não precisa de CPF, email longo ou cartão. O QR Code é gerado na hora.
+                        </p>
+                    </div>
+                    <div class="mt-3 text-[10px] text-emerald-400/80 font-medium flex items-center space-x-1">
+                        <i class="fa-solid fa-shield-halved text-[9px]"></i>
+                        <span>Gateway PIX Seguro</span>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="min-w-[84%] sm:min-w-[70%] md:min-w-0 snap-start flex-shrink-0 md:flex-shrink p-4 rounded-2xl glass-card border border-slate-800/80 flex flex-col justify-between hover:border-amber-500/40 transition">
+                    <div class="space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <div class="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 font-black text-sm">
+                                3
+                            </div>
+                            <span class="text-[9px] text-amber-400/80 uppercase font-bold sm:hidden">Etapa 3 de 3</span>
+                        </div>
+                        <h3 class="font-extrabold text-sm text-white flex items-center space-x-2">
+                            <span>Acesso Imediato</span>
+                            <i class="fa-solid fa-play text-amber-400 text-xs"></i>
+                        </h3>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            O sistema detecta o pagamento <strong class="text-white">em segundos</strong> e libera o título na aba <strong class="text-brand-400">"Meus Filmes"</strong>.
+                        </p>
+                    </div>
+                    <div class="mt-3 text-[10px] text-amber-400/80 font-medium flex items-center space-x-1">
+                        <i class="fa-solid fa-clock-rotate-left text-[9px]"></i>
+                        <span>Acesso vitalício ao filme</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Category Filters Bar (100% Visível e Otimizada para Mobile) -->
+        <div class="space-y-2.5">
+            <div class="flex items-center justify-between px-1">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-layer-group text-cyan-400 text-xs"></i>
+                    <h3 class="text-xs sm:text-sm font-extrabold text-slate-200">Explorar por Gênero</h3>
+                </div>
+                <span class="text-[10px] text-slate-400 font-medium sm:hidden flex items-center space-x-1">
+                    <span>Deslize</span>
+                    <i class="fa-solid fa-arrow-right-long text-[9px] text-cyan-400"></i>
+                </span>
+            </div>
+
+            <div class="flex items-center space-x-2 overflow-x-auto hide-scrollbar pb-2 pt-0.5 px-0.5" id="categoryFilters">
+                <button onclick="filterCategory('all')" class="cat-btn flex items-center space-x-1.5 px-3.5 py-2 rounded-xl font-extrabold text-xs bg-gradient-to-r from-brand-600 via-indigo-600 to-cyan-500 text-white shadow-lg shadow-brand-500/25 transition whitespace-nowrap flex-shrink-0 scale-100">
+                    <i class="fa-solid fa-clapperboard text-xs"></i>
+                    <span>Todos os Filmes</span>
+                </button>
+                <button onclick="filterCategory('28')" class="cat-btn flex items-center space-x-1.5 px-3.5 py-2 rounded-xl font-bold text-xs glass-card text-slate-300 hover:text-white hover:bg-slate-800 transition whitespace-nowrap flex-shrink-0">
+                    <i class="fa-solid fa-fire-flame-curved text-xs text-amber-400"></i>
+                    <span>Ação</span>
+                </button>
+                <button onclick="filterCategory('878')" class="cat-btn flex items-center space-x-1.5 px-3.5 py-2 rounded-xl font-bold text-xs glass-card text-slate-300 hover:text-white hover:bg-slate-800 transition whitespace-nowrap flex-shrink-0">
+                    <i class="fa-solid fa-rocket text-xs text-cyan-400"></i>
+                    <span>Ficção</span>
+                </button>
+                <button onclick="filterCategory('18')" class="cat-btn flex items-center space-x-1.5 px-3.5 py-2 rounded-xl font-bold text-xs glass-card text-slate-300 hover:text-white hover:bg-slate-800 transition whitespace-nowrap flex-shrink-0">
+                    <i class="fa-solid fa-masks-theater text-xs text-purple-400"></i>
+                    <span>Drama</span>
+                </button>
+                <button onclick="filterCategory('16')" class="cat-btn flex items-center space-x-1.5 px-3.5 py-2 rounded-xl font-bold text-xs glass-card text-slate-300 hover:text-white hover:bg-slate-800 transition whitespace-nowrap flex-shrink-0">
+                    <i class="fa-solid fa-wand-magic-sparkles text-xs text-pink-400"></i>
+                    <span>Animação</span>
+                </button>
+                <button onclick="filterCategory('27')" class="cat-btn flex items-center space-x-1.5 px-3.5 py-2 rounded-xl font-bold text-xs glass-card text-slate-300 hover:text-white hover:bg-slate-800 transition whitespace-nowrap flex-shrink-0">
+                    <i class="fa-solid fa-ghost text-xs text-emerald-400"></i>
+                    <span>Terror</span>
+                </button>
+                <button onclick="filterCategory('35')" class="cat-btn flex items-center space-x-1.5 px-3.5 py-2 rounded-xl font-bold text-xs glass-card text-slate-300 hover:text-white hover:bg-slate-800 transition whitespace-nowrap flex-shrink-0">
+                    <i class="fa-solid fa-face-laugh-squint text-xs text-yellow-400"></i>
+                    <span>Comédia</span>
+                </button>
+                <button onclick="filterCategory('12')" class="cat-btn flex items-center space-x-1.5 px-3.5 py-2 rounded-xl font-bold text-xs glass-card text-slate-300 hover:text-white hover:bg-slate-800 transition whitespace-nowrap flex-shrink-0">
+                    <i class="fa-solid fa-compass text-xs text-sky-400"></i>
+                    <span>Aventura</span>
+                </button>
+                <button onclick="filterCategory('80')" class="cat-btn flex items-center space-x-1.5 px-3.5 py-2 rounded-xl font-bold text-xs glass-card text-slate-300 hover:text-white hover:bg-slate-800 transition whitespace-nowrap flex-shrink-0">
+                    <i class="fa-solid fa-user-secret text-xs text-red-400"></i>
+                    <span>Crime</span>
+                </button>
+                <button onclick="filterCategory('10749')" class="cat-btn flex items-center space-x-1.5 px-3.5 py-2 rounded-xl font-bold text-xs glass-card text-slate-300 hover:text-white hover:bg-slate-800 transition whitespace-nowrap flex-shrink-0">
+                    <i class="fa-solid fa-heart text-xs text-rose-400"></i>
+                    <span>Romance</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Movie Catalog Grid -->
+        <div class="space-y-4" id="catalogSection">
+            <div class="flex justify-between items-center">
+                <h2 id="catalogTitle" class="text-base sm:text-lg font-extrabold tracking-tight">Catálogo de Filmes</h2>
+                <span id="movieCount" class="text-xs text-slate-400 font-medium">Carregando...</span>
+            </div>
+            <div id="movieGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+                <div class="col-span-full py-16 text-center text-slate-400">
+                    <i class="fa-solid fa-circle-notch fa-spin text-2xl text-brand-500 mb-2"></i>
+                    <p class="text-xs font-semibold">Conectando ao TMDB...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Support & FAQ Preview Section -->
+        <section id="supportSection" class="rounded-2xl glass-panel border border-slate-800/80 p-5 sm:p-7 shadow-lg space-y-4">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-slate-800/80">
+                <div>
+                    <span class="text-[10px] uppercase font-extrabold text-emerald-400 tracking-wider flex items-center space-x-1">
+                        <i class="fa-solid fa-circle-check text-[8px]"></i>
+                        <span>Central de Atendimento</span>
+                    </span>
+                    <h2 class="text-base sm:text-lg font-black text-white">Dúvidas Frequentes & Suporte</h2>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <a href="https://wa.me/5551999999999?text=Ol%C3%A1%2C%20preciso%20de%20ajuda%20com%20um%20filme%20no%20CineStore" target="_blank" class="px-3.5 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/40 font-bold text-xs transition flex items-center space-x-1.5">
+                        <i class="fa-brands fa-whatsapp text-sm"></i>
+                        <span>WhatsApp Suporte</span>
+                    </a>
+                    <button onclick="openSupportModal()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition flex items-center space-x-1.5">
+                        <i class="fa-solid fa-circle-info text-xs"></i>
+                        <span>Ver FAQ Completo</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Fast FAQs -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 space-y-1">
+                    <h4 class="font-bold text-white flex items-center space-x-1.5">
+                        <i class="fa-solid fa-circle-question text-brand-400 text-xs"></i>
+                        <span>Preciso criar conta para comprar?</span>
+                    </h4>
+                    <p class="text-slate-400 text-[11px] leading-relaxed">
+                        Não é obrigatório! Você pode gerar o PIX direto e o filme será liberado na sua biblioteca local. O login serve apenas para sincronizar seus filmes se desejar.
+                    </p>
+                </div>
+
+                <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 space-y-1">
+                    <h4 class="font-bold text-white flex items-center space-x-1.5">
+                        <i class="fa-solid fa-clock text-emerald-400 text-xs"></i>
+                        <span>Quanto tempo demora para liberar o filme?</span>
+                    </h4>
+                    <p class="text-slate-400 text-[11px] leading-relaxed">
+                        O PIX compensa em <strong>1 a 10 segundos</strong>. Nosso sistema consulta o gateway bancário em tempo real e libera o player automaticamente assim que o banco confirma.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Support Floating Button -->
+    <button onclick="openSupportModal()" class="fixed bottom-5 left-5 z-40 px-3.5 py-2.5 rounded-full bg-slate-900/90 border border-slate-700/80 text-white font-bold text-xs shadow-2xl backdrop-blur-md hover:border-emerald-400 hover:text-emerald-400 hover:scale-105 transition flex items-center space-x-2 group">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+        <i class="fa-solid fa-headset text-sm text-emerald-400"></i>
+        <span class="text-[11px]">Suporte & Ajuda</span>
+    </button>
+
+    <footer class="glass-panel border-t border-slate-800/80 mt-10 py-6 text-xs text-slate-400">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center space-x-2">
+                <div class="w-6 h-6 rounded-lg bg-brand-600 flex items-center justify-center text-white text-[10px]">
+                    <i class="fa-solid fa-clapperboard"></i>
+                </div>
+                <span class="font-bold text-slate-200">CineStore &copy; 2026</span>
+                <span class="text-slate-600">•</span>
+                <span class="text-slate-400">Pagamentos instantâneos via PIX 24h</span>
+            </div>
+            <div class="flex items-center space-x-4 text-slate-400 font-semibold text-[11px]">
+                <button onclick="scrollToHowItWorks()" class="hover:text-white transition">Como Funciona</button>
+                <button onclick="openSupportModal()" class="hover:text-white transition">Suporte Técnico</button>
+                <span class="inline-flex items-center text-emerald-400">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5"></span>
+                    Gateway PIX Operacional
+                </span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Cart Modal -->
+    <div id="cartModal" class="fixed inset-0 z-50 overflow-hidden hidden">
+        <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-md transition-opacity" onclick="toggleCartModal()"></div>
+        <div class="absolute inset-x-0 bottom-0 sm:inset-x-auto sm:inset-y-0 sm:right-0 max-w-full flex sm:pl-10">
+            <div class="w-full sm:w-[380px] bg-slate-900/95 backdrop-blur-xl border-t sm:border-t-0 sm:border-l border-slate-800 rounded-t-3xl sm:rounded-none p-4 sm:p-6 flex flex-col justify-between shadow-2xl max-h-[85vh] sm:max-h-full">
+                <div>
+                    <div class="w-10 h-1 bg-slate-700 rounded-full mx-auto mb-3 sm:hidden"></div>
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                        <h3 class="text-sm font-extrabold flex items-center space-x-2">
+                            <i class="fa-solid fa-bag-shopping text-brand-500"></i>
+                            <span>Seu Carrinho</span>
+                        </h3>
+                        <button onclick="toggleCartModal()" class="text-slate-400 hover:text-white p-2 rounded-xl glass-card"><i class="fa-solid fa-xmark text-xs"></i></button>
+                    </div>
+                    <div id="cartItemsList" class="divide-y divide-slate-800/60 max-h-[45vh] sm:max-h-[60vh] overflow-y-auto my-2 pr-1"></div>
+                </div>
+                <div class="pt-3 border-t border-slate-800 bg-slate-900/95">
+                    <div class="flex justify-between items-center text-sm font-semibold mb-3">
+                        <span class="text-slate-400 text-xs">Total:</span>
+                        <span id="cartTotalPrice" class="text-brand-400 text-lg font-black">R$ 0,00</span>
+                    </div>
+                    <button onclick="proceedToCheckout()" id="checkoutBtn" disabled class="w-full py-3 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs shadow-lg shadow-brand-600/30 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2">
+                        <span>Pagar com PIX Instantâneo</span>
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PIX Checkout Modal -->
+    <div id="checkoutModal" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
+        <div class="absolute inset-0 bg-slate-950/85 backdrop-blur-md" onclick="toggleCheckoutModal()"></div>
+        <div class="relative bg-slate-900/95 backdrop-blur-xl border-t sm:border border-slate-800 rounded-t-3xl sm:rounded-2xl max-w-md w-full p-4 sm:p-6 shadow-2xl z-10 max-h-[90vh] overflow-y-auto">
+            <div class="w-10 h-1 bg-slate-700 rounded-full mx-auto mb-3 sm:hidden"></div>
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+                <h3 class="text-sm font-extrabold flex items-center space-x-2">
+                    <i class="fa-solid fa-qrcode text-emerald-400"></i>
+                    <span>Pagamento via PIX 4K</span>
+                </h3>
+                <button onclick="toggleCheckoutModal()" class="text-slate-400 hover:text-white p-2 rounded-xl glass-card"><i class="fa-solid fa-xmark text-xs"></i></button>
+            </div>
+
+            <!-- PIX QR Code (direto, sem formulário) -->
+            <div id="checkoutPixArea" class="space-y-4 text-xs">
+
+                <!-- Loading state -->
+                <div id="pixLoading" class="py-10 text-center space-y-3">
+                    <i class="fa-solid fa-circle-notch fa-spin text-3xl text-brand-500"></i>
+                    <p class="text-slate-400 font-semibold text-xs">Gerando seu PIX...</p>
+                </div>
+
+                <!-- QR Code (oculto até carregar) -->
+                <div id="pixReady" class="hidden space-y-3.5">
+                    
+                    <!-- 3 Quick Step Icons -->
+                    <div class="grid grid-cols-3 gap-2 text-center text-[10px] bg-slate-950/80 p-2.5 rounded-xl border border-slate-800">
+                        <div class="space-y-1">
+                            <span class="w-5 h-5 rounded-full bg-brand-500/20 text-brand-400 font-bold inline-flex items-center justify-center text-[9px]">1</span>
+                            <p class="text-slate-400 font-medium">Copie o código</p>
+                        </div>
+                        <div class="space-y-1">
+                            <span class="w-5 h-5 rounded-full bg-brand-500/20 text-brand-400 font-bold inline-flex items-center justify-center text-[9px]">2</span>
+                            <p class="text-slate-400 font-medium">Pague no Banco</p>
+                        </div>
+                        <div class="space-y-1">
+                            <span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold inline-flex items-center justify-center text-[9px]">3</span>
+                            <p class="text-emerald-400 font-bold">Auto-Liberação</p>
+                        </div>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-slate-950 border border-slate-800 text-center space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] text-slate-400 font-bold uppercase">Aguardando Pagamento</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 animate-pulse">
+                                <i class="fa-solid fa-bolt mr-1"></i> PIX Instantâneo Ativo
+                            </span>
+                        </div>
+
+                        <div class="bg-white p-3 rounded-xl w-36 h-36 mx-auto flex items-center justify-center shadow-inner">
+                            <img id="pixQrCodeImg" src="" alt="QR Code PIX" class="w-full h-full object-contain">
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="block font-bold text-slate-400 text-[10px] uppercase tracking-wider">PIX Copia e Cola</label>
+                            <div id="pixCodeBox" class="font-mono text-[9px] text-brand-300 bg-slate-900 p-3 rounded-xl border border-slate-800 select-all break-all max-h-20 overflow-y-auto text-left"></div>
+                        </div>
+
+                        <button type="button" onclick="copyPixCode()" class="w-full py-3 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs shadow-lg shadow-brand-600/30 transition flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-copy text-xs"></i>
+                            <span>Copiar Código PIX</span>
+                        </button>
+                    </div>
+
+                    <div class="p-3 rounded-xl bg-slate-950/60 border border-slate-800 text-center space-y-2">
+                        <p class="text-[10px] text-slate-400">Após realizar o PIX no seu banco, o sistema liberará automaticamente em segundos.</p>
+                        <button type="button" onclick="confirmPixPayment()" class="w-full py-2.5 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/40 font-bold rounded-xl text-xs transition flex items-center justify-center space-x-1.5">
+                            <i class="fa-solid fa-check-circle text-xs"></i>
+                            <span>Verificar Pagamento Agora</span>
+                        </button>
+                    </div>
+
+                    <div class="text-center pt-1">
+                        <button onclick="toggleCheckoutModal(); openSupportModal();" class="text-[10px] text-slate-400 hover:text-emerald-400 transition font-semibold flex items-center justify-center space-x-1 mx-auto">
+                            <i class="fa-solid fa-headset text-xs"></i>
+                            <span>Problemas com o pagamento? Falar com o suporte</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Error state -->
+                <div id="pixError" class="hidden py-8 text-center space-y-3">
+                    <i class="fa-solid fa-circle-exclamation text-3xl text-amber-500"></i>
+                    <p id="pixErrorMsg" class="text-slate-300 font-semibold text-xs"></p>
+                    <button onclick="proceedToCheckout()" class="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs transition">
+                        Tentar novamente
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Movie Details Modal -->
+    <div id="movieDetailsModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div class="absolute inset-0 bg-slate-950/85 backdrop-blur-md" onclick="closeMovieDetails()"></div>
+        <div class="relative bg-slate-900/95 backdrop-blur-xl border border-slate-800 rounded-2xl max-w-lg w-full p-4 sm:p-6 shadow-2xl z-10 max-h-[85vh] overflow-y-auto">
+            <button onclick="closeMovieDetails()" class="absolute top-3 right-3 text-slate-400 hover:text-white z-20 glass-card p-2 rounded-full"><i class="fa-solid fa-xmark text-xs"></i></button>
+            <div id="movieDetailsContent"></div>
+        </div>
+    </div>
+
+    <!-- Support & FAQ Modal -->
+    <div id="supportModal" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
+        <div class="absolute inset-0 bg-slate-950/85 backdrop-blur-md" onclick="closeSupportModal()"></div>
+        <div class="relative bg-slate-900/95 backdrop-blur-xl border-t sm:border border-slate-800 rounded-t-3xl sm:rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl z-10 max-h-[90vh] overflow-y-auto">
+            <div class="w-10 h-1 bg-slate-700 rounded-full mx-auto mb-3 sm:hidden"></div>
+            
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+                <div class="flex items-center space-x-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                        <i class="fa-solid fa-headset text-sm"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-extrabold text-white">Central de Suporte CineStore</h3>
+                        <span class="text-[10px] text-slate-400">Ajuda com compras, pagamentos e filmes</span>
+                    </div>
+                </div>
+                <button onclick="closeSupportModal()" class="text-slate-400 hover:text-white p-2 rounded-xl glass-card"><i class="fa-solid fa-xmark text-xs"></i></button>
+            </div>
+
+            <div class="space-y-4 text-xs">
+                <!-- Direct Contact Buttons -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <a href="https://wa.me/5551999999999?text=Ol%C3%A1%2C%20preciso%20de%20ajuda%20com%20um%20filme%20no%20CineStore" target="_blank" class="p-3 rounded-xl bg-emerald-600/15 hover:bg-emerald-600/25 border border-emerald-500/30 text-emerald-300 font-bold flex items-center space-x-2.5 transition">
+                        <div class="w-7 h-7 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400">
+                            <i class="fa-brands fa-whatsapp text-sm"></i>
+                        </div>
+                        <div>
+                            <div class="text-[11px]">WhatsApp Suporte</div>
+                            <div class="text-[9px] text-slate-400 font-normal">Atendimento imediato</div>
+                        </div>
+                    </a>
+
+                    <a href="mailto:suporte@cinestore.com.br?subject=Ajuda%20com%20Pedido%20CineStore" class="p-3 rounded-xl bg-sky-600/15 hover:bg-sky-600/25 border border-sky-500/30 text-sky-300 font-bold flex items-center space-x-2.5 transition">
+                        <div class="w-7 h-7 rounded-lg bg-sky-500/20 flex items-center justify-center text-sky-400">
+                            <i class="fa-solid fa-envelope text-sm"></i>
+                        </div>
+                        <div>
+                            <div class="text-[11px]">E-mail de Suporte</div>
+                            <div class="text-[9px] text-slate-400 font-normal">suporte@cinestore.com.br</div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- FAQ Accordion -->
+                <div class="space-y-2">
+                    <h4 class="font-extrabold text-slate-300 text-[11px] uppercase tracking-wider">Perguntas Frequentes (FAQ)</h4>
+                    
+                    <details class="group rounded-xl bg-slate-950/70 border border-slate-800 p-3 open:bg-slate-950 transition cursor-pointer">
+                        <summary class="font-bold text-white text-xs flex justify-between items-center list-none select-none">
+                            <span>Como funciona o pagamento via PIX?</span>
+                            <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 group-open:rotate-180 transition"></i>
+                        </summary>
+                        <p class="text-slate-400 text-[11px] mt-2 leading-relaxed pl-1">
+                            Ao clicar em "Pagar com PIX", nosso sistema gera instantaneamente um QR Code e um código "Copia e Cola" conectado ao gateway PIX seguro. Abra o app do seu banco, cole o código ou aponte a câmera. O sistema reconhece o pagamento e libera os filmes sem você precisar preencher formulários longos.
+                        </p>
+                    </details>
+
+                    <details class="group rounded-xl bg-slate-950/70 border border-slate-800 p-3 open:bg-slate-950 transition cursor-pointer">
+                        <summary class="font-bold text-white text-xs flex justify-between items-center list-none select-none">
+                            <span>Paguei o PIX mas o filme não liberou, o que fazer?</span>
+                            <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 group-open:rotate-180 transition"></i>
+                        </summary>
+                        <p class="text-slate-400 text-[11px] mt-2 leading-relaxed pl-1">
+                            O sistema verifica o pagamento automaticamente a cada poucos segundos. Se houver qualquer instabilidade no banco, você pode clicar no botão <strong>"Verificar Pagamento Agora"</strong> dentro da tela de checkout ou nos contatar via WhatsApp enviando seu comprovante.
+                        </p>
+                    </details>
+
+                    <details class="group rounded-xl bg-slate-950/70 border border-slate-800 p-3 open:bg-slate-950 transition cursor-pointer">
+                        <summary class="font-bold text-white text-xs flex justify-between items-center list-none select-none">
+                            <span>Onde ficam os filmes que eu comprei?</span>
+                            <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 group-open:rotate-180 transition"></i>
+                        </summary>
+                        <p class="text-slate-400 text-[11px] mt-2 leading-relaxed pl-1">
+                            Todos os seus filmes ficam salvos na aba <strong>"Meus Filmes"</strong> no menu superior. Eles ficam disponíveis 24 horas por dia para você assistir quando quiser em qualquer dispositivo.
+                        </p>
+                    </details>
+
+                    <details class="group rounded-xl bg-slate-950/70 border border-slate-800 p-3 open:bg-slate-950 transition cursor-pointer">
+                        <summary class="font-bold text-white text-xs flex justify-between items-center list-none select-none">
+                            <span>Preciso pagar mensalidade ou assinatura?</span>
+                            <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 group-open:rotate-180 transition"></i>
+                        </summary>
+                        <p class="text-slate-400 text-[11px] mt-2 leading-relaxed pl-1">
+                            Não! No CineStore você paga apenas pelos filmes individuais que deseja assistir, sem cobranças recorrentes no seu cartão ou débitos automáticos.
+                        </p>
+                    </details>
+                </div>
+
+                <!-- Status Gateway -->
+                <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between text-[11px]">
+                    <div class="flex items-center space-x-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                        <span class="text-slate-300 font-semibold">Gateway PIX 24h:</span>
+                        <span class="text-emerald-400 font-bold">100% Operacional</span>
+                    </div>
+                    <span class="text-slate-500 text-[10px]">Latência ~250ms</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 right-4 z-50 glass-panel border border-slate-700/80 text-slate-100 px-3.5 py-2.5 rounded-xl shadow-xl flex items-center space-x-3 transition-all duration-300 transform translate-y-20 opacity-0 pointer-events-none text-xs">
+        <div id="toastIcon" class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
+            <i class="fa-solid fa-check text-xs"></i>
+        </div>
+        <div>
+            <h4 id="toastTitle" class="font-bold uppercase tracking-wider text-slate-400 text-[9px]">Sucesso</h4>
+            <p id="toastMessage" class="font-semibold text-slate-200">Ação realizada!</p>
+        </div>
+    </div>
+
+    <script>
+        // ─── CONFIGURAÇÕES ──────────────────────────────────────────────────────────
+        const TMDB_API_KEY = '015b5ab92c8f7d32e373652e732e3379';
+        const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
+        const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
+        const BACKDROP_BASE_URL = 'https://image.tmdb.org/t/p/original';
+
+        // SyncPay — use client_id e client_secret do seu painel
+        const SYNCPAY_CLIENT_ID     = '0abb8856-0aa3-41fc-8e5c-a8267a0225f9';
+        const SYNCPAY_CLIENT_SECRET = 'e8b118ce-eeb9-413d-a3ac-ecfac6e9c521';
+        // Proxy — funciona em localhost e na Vercel
+        const SYNCPAY_API_URL       = '/api/syncpay';
+
+        // ─── ESTADO GLOBAL ──────────────────────────────────────────────────────────
+        let movies        = [];
+        let cart          = [];
+        let userLibrary   = [];
+        let currentUser   = null;
+        let currentGenre  = 'all';
+        let searchQuery   = '';
+        let authMode      = 'login';
+        let currentPixPayload   = '';
+        let syncpayToken        = null;
+        let syncpayTokenExpiry  = null;
+        let pendingTransactionId = null;
+
+        const genreMap = {
+            28: "Ação", 12: "Aventura", 16: "Animação", 35: "Comédia", 80: "Crime",
+            99: "Documentário", 18: "Drama", 10751: "Família", 14: "Fantasia",
+            36: "História", 27: "Terror", 10402: "Música", 9648: "Mistério",
+            10749: "Romance", 878: "Ficção Científica", 53: "Suspense"
+        };
+
+        // ─── SYNCPAY AUTH ────────────────────────────────────────────────────────────
+        /**
+         * Obtém (ou reutiliza) o Bearer Token da SyncPay.
+         * O token tem validade de 1 hora; só chama a API quando necessário.
+         */
+        async function getSyncpayToken() {
+            const now = Date.now();
+            // Reutiliza se ainda válido (com 60s de margem)
+            if (syncpayToken && syncpayTokenExpiry && now < syncpayTokenExpiry - 60_000) {
+                return syncpayToken;
+            }
+
+            const res = await fetch(`${SYNCPAY_API_URL}/auth-token`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({
+                    client_id:     SYNCPAY_CLIENT_ID,
+                    client_secret: SYNCPAY_CLIENT_SECRET
+                })
+            });
+
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err.message || `Erro ao autenticar na SyncPay (${res.status})`);
+            }
+
+            const data = await res.json();
+            syncpayToken  = data.access_token;
+            // expires_in é em segundos
+            syncpayTokenExpiry = now + (data.expires_in || 3600) * 1000;
+            return syncpayToken;
+        }
+
+        // ─── SYNCPAY PIX CASHIN ──────────────────────────────────────────────────────
+        async function createPixCharge(amount) {
+            const token = await getSyncpayToken();
+
+            const res = await fetch(`${SYNCPAY_API_URL}/cash-in`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type':  'application/json',
+                    'Accept':        'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    amount,
+                    description: `CineStore — ${cart.map(m => m.title).join(', ')}`
+                })
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                const errs = data.errors ? Object.values(data.errors).flat().join(' | ') : data.message;
+                throw new Error(errs || `Erro SyncPay (${res.status})`);
+            }
+
+            return data; // { message, pix_code, identifier }
+        }
+
+        // ─── CHECKOUT FLOW ───────────────────────────────────────────────────────────
+        async function proceedToCheckout() {
+            if (cart.length === 0) return;
+            toggleCartModal();
+            toggleCheckoutModal();
+            await generatePixPayment();
+        }
+
+        async function generatePixPayment() {
+            const total = cart.reduce((acc, item) => acc + item.price, 0);
+
+            // Mostra loading, oculta os outros estados
+            document.getElementById('pixLoading').classList.remove('hidden');
+            document.getElementById('pixReady').classList.add('hidden');
+            document.getElementById('pixError').classList.add('hidden');
+
+            try {
+                const result = await createPixCharge(total);
+
+                currentPixPayload    = result.pix_code;
+                pendingTransactionId = result.identifier;
+
+                document.getElementById('pixCodeBox').textContent = currentPixPayload;
+                document.getElementById('pixQrCodeImg').src =
+                    `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(currentPixPayload)}`;
+
+                document.getElementById('pixLoading').classList.add('hidden');
+                document.getElementById('pixReady').classList.remove('hidden');
+
+                startPaymentPolling();
+            } catch (err) {
+                console.error('[SyncPay]', err);
+                document.getElementById('pixLoading').classList.add('hidden');
+                document.getElementById('pixErrorMsg').textContent = err.message || 'Falha ao gerar PIX. Tente novamente.';
+                document.getElementById('pixError').classList.remove('hidden');
+            }
+        }
+
+        function toggleCheckoutModal() {
+            const modal = document.getElementById('checkoutModal');
+            const isHidden = modal.classList.contains('hidden');
+            modal.classList.toggle('hidden');
+            // Se estiver fechando o modal, para o polling
+            if (!isHidden) stopPaymentPolling();
+        }
+
+        function copyPixCode() {
+            if (!currentPixPayload) return;
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(currentPixPayload)
+                    .then(() => showToast('Copiado!', 'Código PIX copiado com sucesso!', 'success'))
+                    .catch(() => fallbackCopyText(currentPixPayload));
+            } else {
+                fallbackCopyText(currentPixPayload);
+            }
+        }
+
+        function fallbackCopyText(text) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            Object.assign(ta.style, { position: 'fixed', top: '0', left: '0', opacity: '0' });
+            document.body.appendChild(ta);
+            ta.focus(); ta.select();
+            try {
+                document.execCommand('copy')
+                    ? showToast('Copiado!', 'Código PIX copiado!', 'success')
+                    : showToast('Aviso', 'Selecione e copie manualmente.', 'warning');
+            } catch {
+                showToast('Erro', 'Não foi possível copiar automaticamente.', 'warning');
+            }
+            document.body.removeChild(ta);
+        }
+
+        // ─── VERIFICAÇÃO REAL DO PAGAMENTO ────────────────────────────────────────
+        let pollingInterval = null;
+
+        /**
+         * Consulta o status da transação na SyncPay.
+         * Retorna 'completed' | 'pending' | 'failed' | ...
+         */
+        async function checkTransactionStatus() {
+            if (!pendingTransactionId) return null;
+
+            try {
+                const token = await getSyncpayToken();
+                const res = await fetch(`${SYNCPAY_API_URL}/transaction/${pendingTransactionId}`, {
+                    headers: {
+                        'Accept':        'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!res.ok) return null;
+                const data = await res.json();
+                return data?.data?.status || null;
+            } catch (err) {
+                console.error('[Status Check]', err);
+                return null;
+            }
+        }
+
+        /**
+         * Inicia o polling automático a cada 5 segundos.
+         * Libera os filmes automaticamente quando o pagamento for confirmado.
+         */
+        function startPaymentPolling() {
+            stopPaymentPolling(); // garante que não haja interval duplicado
+            pollingInterval = setInterval(async () => {
+                const status = await checkTransactionStatus();
+                if (status === 'completed') {
+                    stopPaymentPolling();
+                    finalizePaidOrder();
+                }
+            }, 5000);
+        }
+
+        function stopPaymentPolling() {
+            if (pollingInterval) {
+                clearInterval(pollingInterval);
+                pollingInterval = null;
+            }
+        }
+
+        /**
+         * Botão "Confirmar Pagamento" — verifica na API antes de liberar.
+         */
+        async function confirmPixPayment() {
+            if (!pendingTransactionId) {
+                showToast('Erro', 'Nenhuma transação pendente encontrada.', 'warning');
+                return;
+            }
+
+            showToast('Verificando...', 'Consultando status do pagamento PIX...', 'info');
+
+            const status = await checkTransactionStatus();
+
+            if (status === 'completed') {
+                stopPaymentPolling();
+                showToast('PIX Confirmado', 'Pagamento aprovado e liquidado com sucesso!', 'success');
+                finalizePaidOrder();
+            } else if (status === 'pending') {
+                showToast('Aguardando', 'Pagamento ainda não foi detectado. Aguarde e tente novamente.', 'warning');
+            } else if (status === 'failed') {
+                showToast('Falhou', 'O pagamento falhou ou expirou. Gere um novo PIX.', 'warning');
+                stopPaymentPolling();
+                resetCheckoutStep();
+            } else {
+                showToast('Não confirmado', 'Pagamento ainda não identificado. Realize o PIX no app do seu banco.', 'warning');
+            }
+        }
+
+        function finalizePaidOrder() {
+            cart.forEach(item => {
+                if (!userLibrary.some(l => l.id === item.id)) userLibrary.push(item);
+            });
+
+            cart = [];
+            updateCartUI();
+
+            document.getElementById('checkoutModal').classList.add('hidden');
+            document.getElementById('cartModal').classList.add('hidden');
+            pendingTransactionId = null;
+
+            showToast('Liberado!', 'Filmes adicionados à sua biblioteca!', 'success');
+            setTimeout(() => showMyLibrary(), 500);
+        }
+
+        // ─── SUPABASE REST NATIVO ──────────────────────────────────────────────────
+        const SUPABASE_URL = 'https://dbcsigvltyywbjwfhfpa.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRiY3NpZ3ZsdHl5d2Jqd2ZoZnBhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTExNTM1ODQsImV4cCI6MjEwNjcyOTU4NH0.8ogf9hSzB95Gr8TGuXNlp1hM4Ha7A0N419w86AcY77s';
+        
+        const supabaseHeaders = {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': 'application/json'
+        };
+
+        window.onload = async function() {
+            await fetchMovies();
+        };
+
+        async function fetchMovies() {
+            let userMovies = [];
+
+            // Carrega exclusivamente do Supabase (seus filmes e séries cadastrados)
+            try {
+                const res = await fetch(`${SUPABASE_URL}/rest/v1/movies?select=*&order=created_at.desc`, {
+                    headers: supabaseHeaders
+                });
+
+                if (res.ok) {
+                    const dbMovies = await res.json();
+                    if (Array.isArray(dbMovies) && dbMovies.length > 0) {
+                        userMovies = dbMovies.map(m => ({
+                            id: m.id,
+                            isCustom: true,
+                            title: m.title,
+                            type: m.type || 'movie',
+                            category: m.category || 'Cinema 4K',
+                            genreIds: [],
+                            year: m.year || '2026',
+                            duration: m.duration || (m.type === 'series' ? '1ª Temporada' : '2h 15m'),
+                            rating: m.rating ? parseFloat(m.rating).toFixed(1) : '8.5',
+                            price: parseFloat(m.price || 0) || 24.90,
+                            image: m.image || 'https://placehold.co/600x900/1e293b/ffffff?text=CineStore',
+                            backdrop: m.backdrop || m.image || '',
+                            trailer: m.trailer_url || '',
+                            stream: m.stream_url || '',
+                            description: m.description || 'Uma superprodução imperdível em 4K Ultra HD.',
+                            isFeatured: !!m.is_featured
+                        }));
+                    }
+                }
+            } catch (dbErr) {
+                console.error('Supabase fetch error:', dbErr);
+            }
+
+            movies = userMovies;
+
+            if (movies.length > 0) {
+                const featured = movies.find(m => m.isFeatured) || movies[0];
+                setupHero(featured);
+                renderMovies(movies);
+            } else {
+                // Se ainda não cadastrou nenhum filme
+                document.getElementById('heroTitle').textContent = 'Catálogo em Atualização';
+                document.getElementById('heroDesc').textContent = 'Novos títulos e lançamentos em 4K estão sendo adicionados em breve.';
+                document.getElementById('heroButtons').innerHTML = '';
+                renderMovies([]);
+            }
+        }
+
+        function setupHero(movie) {
+            if (movie.backdrop) document.getElementById('heroBg').style.backgroundImage = `url('${movie.backdrop}')`;
+            document.getElementById('heroTitle').textContent = movie.title;
+            document.getElementById('heroDesc').textContent = movie.description;
+            document.getElementById('heroButtons').innerHTML = `
+                <button onclick="quickAddMovie('${movie.id}')" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-cyan-500 hover:from-brand-500 hover:to-cyan-400 font-bold text-xs flex items-center space-x-2 shadow-lg shadow-brand-500/25 transition">
+                    <i class="fa-solid fa-bag-shopping text-xs"></i>
+                    <span>Comprar por R$ ${movie.price.toFixed(2).replace('.', ',')}</span>
+                </button>
+                <button onclick="openMovieDetails('${movie.id}')" class="px-4 py-2.5 rounded-xl glass-card hover:bg-slate-800 font-bold text-xs transition flex items-center space-x-1.5 text-slate-200">
+                    <i class="fa-solid fa-circle-info text-cyan-400"></i>
+                    <span>Ver Detalhes & Trailer</span>
+                </button>
+            `;
+        }
+
+        function renderMovies(movieList) {
+            const grid = document.getElementById('movieGrid');
+            const countEl = document.getElementById('movieCount');
+            grid.innerHTML = '';
+            countEl.textContent = `${movieList.length} títulos`;
+
+            if (movieList.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full py-16 text-center text-slate-500 space-y-2">
+                        <i class="fa-solid fa-film text-3xl opacity-40 text-brand-400"></i>
+                        <p class="text-xs font-semibold text-slate-300">Nenhum título encontrado.</p>
+                        <p class="text-[11px] text-slate-500">Tente buscar por outro termo ou selecione outra categoria.</p>
+                    </div>`;
+                return;
+            }
+
+            movieList.forEach(movie => {
+                const card = document.createElement('div');
+                card.className = 'group glass-card rounded-2xl overflow-hidden hover:border-brand-500/50 hover:shadow-xl hover:shadow-brand-500/10 transition duration-300 flex flex-col justify-between';
+                card.innerHTML = `
+                    <div>
+                        <div class="relative aspect-[2/3] overflow-hidden bg-slate-900 cursor-pointer" onclick="openMovieDetails('${movie.id}')">
+                            <img src="${movie.image}" alt="${movie.title}" onerror="this.src='https://placehold.co/600x900/1e293b/ffffff?text=CineStore'" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            
+                            <!-- Badges Top -->
+                            <div class="absolute top-2 right-2 bg-slate-950/85 backdrop-blur-md px-1.5 py-0.5 rounded-lg text-[9px] font-bold flex items-center space-x-1 text-amber-400 border border-slate-700/50">
+                                <i class="fa-solid fa-star text-[8px]"></i>
+                                <span>${movie.rating}</span>
+                            </div>
+                            
+                            <div class="absolute top-2 left-2 flex flex-col gap-1">
+                                <span class="bg-gradient-to-r from-brand-600 to-indigo-600 text-white text-[8px] px-2 py-0.5 rounded-md font-extrabold uppercase tracking-wider shadow-md">${movie.category}</span>
+                                ${movie.type === 'series' ? '<span class="bg-cyan-500/90 text-white text-[8px] px-2 py-0.5 rounded-md font-black uppercase tracking-wider">Série</span>' : ''}
+                            </div>
+
+                            <!-- 4K UHD Ribbon -->
+                            <div class="absolute bottom-2 left-2 bg-slate-950/80 backdrop-blur-md px-1.5 py-0.5 rounded text-[8px] font-extrabold text-cyan-400 border border-cyan-500/30">
+                                4K ULTRA HD
+                            </div>
+                        </div>
+
+                        <div class="p-3">
+                            <h3 onclick="openMovieDetails('${movie.id}')" class="font-extrabold text-xs mb-1 truncate cursor-pointer hover:text-cyan-400 transition text-white">${movie.title}</h3>
+                            <div class="flex items-center justify-between text-[10px] text-slate-400 mb-1.5 font-medium">
+                                <span>${movie.year}</span>
+                                <span>${movie.duration || '2h 15m'}</span>
+                            </div>
+                            <div class="text-xs font-black text-white flex items-center justify-between">
+                                <span class="text-cyan-400 font-extrabold">R$ ${movie.price.toFixed(2).replace('.', ',')}</span>
+                                <span class="text-[9px] text-slate-500 font-medium">Vitalício</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-3 pt-0">
+                        <button onclick="addToCart('${movie.id}')" class="w-full py-2 rounded-xl bg-slate-800/90 hover:bg-gradient-to-r hover:from-brand-600 hover:to-cyan-500 text-slate-200 hover:text-white font-bold text-[10px] flex items-center justify-center space-x-1.5 transition shadow-sm">
+                            <i class="fa-solid fa-bag-shopping text-[9px]"></i>
+                            <span>Adicionar ao Carrinho</span>
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // ─── DETALHES RICOS DO FILME / SÉRIE ─────────────────────────────────────────
+        function openMovieDetails(movieId) {
+            const movie = movies.find(m => String(m.id) === String(movieId));
+            if (!movie) return;
+
+            // Transforma link do YouTube em embed se for link direto
+            let embedUrl = null;
+            if (movie.trailer) {
+                if (movie.trailer.includes('youtube.com/watch?v=')) {
+                    const videoId = movie.trailer.split('v=')[1]?.split('&')[0];
+                    if (videoId) embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+                } else if (movie.trailer.includes('youtu.be/')) {
+                    const videoId = movie.trailer.split('youtu.be/')[1]?.split('?')[0];
+                    if (videoId) embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+                }
+            }
+
+            document.getElementById('movieDetailsContent').innerHTML = `
+                <div class="space-y-4">
+                    <!-- Backdrop Banner -->
+                    <div class="relative rounded-2xl overflow-hidden aspect-[16/9] sm:aspect-[21/9] bg-slate-950 border border-slate-800 shadow-xl group">
+                        <img src="${movie.backdrop || movie.image}" class="w-full h-full object-cover opacity-60 group-hover:scale-105 transition duration-700">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent"></div>
+                        
+                        <!-- Badges on Backdrop -->
+                        <div class="absolute top-3 left-3 flex flex-wrap gap-1.5">
+                            <span class="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider bg-brand-600 text-white shadow-md">
+                                ${movie.type === 'series' ? 'Série Completa' : 'Filme 4K'}
+                            </span>
+                            <span class="px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase bg-slate-900/90 text-cyan-400 border border-cyan-500/30">
+                                HDR10+ • Dolby Atmos
+                            </span>
+                        </div>
+
+                        <!-- Rating Badge -->
+                        <div class="absolute top-3 right-3 bg-slate-950/90 backdrop-blur-md px-2 py-1 rounded-lg text-[10px] font-extrabold flex items-center space-x-1 text-amber-400 border border-slate-700">
+                            <i class="fa-solid fa-star text-[9px]"></i>
+                            <span>${movie.rating} / 10</span>
+                        </div>
+
+                        <!-- Quick Play / Trailer Button -->
+                        ${embedUrl ? `
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <button onclick="playTrailerEmbed('${embedUrl}')" class="w-12 h-12 rounded-full bg-brand-600/90 hover:bg-brand-500 text-white flex items-center justify-center shadow-2xl hover:scale-110 transition group/btn">
+                                    <i class="fa-solid fa-play text-sm ml-0.5 text-white"></i>
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <div id="trailerEmbedArea" class="hidden rounded-2xl overflow-hidden aspect-video bg-black border border-slate-800"></div>
+
+                    <!-- Main Info Grid -->
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <div class="w-28 sm:w-36 aspect-[2/3] rounded-xl overflow-hidden bg-slate-900 flex-shrink-0 mx-auto sm:mx-0 shadow-xl border border-slate-800">
+                            <img src="${movie.image}" class="w-full h-full object-cover">
+                        </div>
+
+                        <div class="flex-1 flex flex-col justify-between space-y-3">
+                            <div>
+                                <div class="flex items-center space-x-2 text-[11px] text-slate-400 mb-1">
+                                    <span class="font-bold text-white">${movie.year}</span>
+                                    <span>•</span>
+                                    <span>${movie.duration || '2h 15m'}</span>
+                                    <span>•</span>
+                                    <span class="text-cyan-400 font-semibold">${movie.category}</span>
+                                </div>
+                                <h2 class="text-lg sm:text-xl font-black text-white tracking-tight">${movie.title}</h2>
+                                <p class="text-slate-300 text-xs leading-relaxed mt-2 line-clamp-4 sm:line-clamp-none">${movie.description}</p>
+                            </div>
+
+                            <!-- Tech Specs -->
+                            <div class="grid grid-cols-3 gap-2 py-2 border-y border-slate-800/80 text-[10px] text-center">
+                                <div class="p-1.5 rounded-lg bg-slate-950 border border-slate-800">
+                                    <span class="block text-slate-500 font-bold">QUALIDADE</span>
+                                    <span class="font-black text-white">4K UHD</span>
+                                </div>
+                                <div class="p-1.5 rounded-lg bg-slate-950 border border-slate-800">
+                                    <span class="block text-slate-500 font-bold">ÁUDIO</span>
+                                    <span class="font-black text-cyan-400">5.1 Dub / Leg</span>
+                                </div>
+                                <div class="p-1.5 rounded-lg bg-slate-950 border border-slate-800">
+                                    <span class="block text-slate-500 font-bold">ACESSO</span>
+                                    <span class="font-black text-emerald-400">Vitalício</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer / Purchase Actions -->
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-slate-800">
+                        <div>
+                            <span class="block text-[9px] text-slate-400 uppercase font-bold">Preço com PIX Instantâneo</span>
+                            <div class="flex items-baseline space-x-1.5">
+                                <span class="text-lg sm:text-xl font-black text-white">R$ ${movie.price.toFixed(2).replace('.', ',')}</span>
+                                <span class="text-[10px] text-emerald-400 font-semibold">• Sem mensalidades</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-2 w-full sm:w-auto">
+                            ${movie.trailer && !embedUrl ? `
+                                <a href="${movie.trailer}" target="_blank" class="px-3.5 py-2.5 rounded-xl glass-card hover:bg-slate-800 text-slate-300 hover:text-white font-bold text-xs transition flex items-center space-x-1.5">
+                                    <i class="fa-brands fa-youtube text-red-500 text-xs"></i>
+                                    <span>Trailer</span>
+                                </a>
+                            ` : ''}
+                            <button onclick="quickAddMovie('${movie.id}'); closeMovieDetails();" class="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-cyan-500 hover:from-brand-500 hover:to-cyan-400 text-white font-bold text-xs shadow-lg shadow-brand-500/25 transition flex items-center justify-center space-x-2">
+                                <i class="fa-solid fa-bolt text-xs"></i>
+                                <span>Comprar Agora</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('movieDetailsModal').classList.remove('hidden');
+        }
+
+        function playTrailerEmbed(embedUrl) {
+            const area = document.getElementById('trailerEmbedArea');
+            if (!area) return;
+            area.innerHTML = `<iframe src="${embedUrl}" class="w-full h-full" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
+            area.classList.remove('hidden');
+        }
+
+        function closeMovieDetails() {
+            const area = document.getElementById('trailerEmbedArea');
+            if (area) area.innerHTML = '';
+            document.getElementById('movieDetailsModal').classList.add('hidden');
+        }
+
+
+        // ─── FILTROS ─────────────────────────────────────────────────────────────────
+        function filterCategory(genreKey) {
+            currentGenre = genreKey;
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                const active = btn.getAttribute('onclick').includes(`'${genreKey}'`) || btn.getAttribute('onclick').includes(`"${genreKey}"`);
+                if (active) {
+                    btn.className = 'cat-btn flex items-center space-x-1.5 px-3.5 py-2 rounded-xl font-extrabold text-xs bg-gradient-to-r from-brand-600 via-indigo-600 to-cyan-500 text-white shadow-lg shadow-brand-500/25 transition whitespace-nowrap flex-shrink-0 scale-100';
+                } else {
+                    btn.className = 'cat-btn flex items-center space-x-1.5 px-3.5 py-2 rounded-xl font-bold text-xs glass-card text-slate-300 hover:text-white hover:bg-slate-800 transition whitespace-nowrap flex-shrink-0';
+                }
+            });
+
+            const genreNames = {
+                'all': 'Catálogo Completo',
+                '28': 'Ação',
+                '878': 'Ficção Científica',
+                '18': 'Drama',
+                '16': 'Animação',
+                '27': 'Terror',
+                '35': 'Comédia',
+                '12': 'Aventura',
+                '80': 'Crime & Suspense',
+                '10749': 'Romance'
+            };
+
+            document.getElementById('catalogTitle').textContent = genreNames[genreKey] || 'Catálogo de Filmes';
+            applyFilters();
+        }
+
+        function handleSearch(query) {
+            searchQuery = query.toLowerCase();
+            applyFilters();
+        }
+
+        function applyFilters() {
+            let filtered = movies;
+            
+            if (currentGenre !== 'all') {
+                const genreName = genreMap[currentGenre] || currentGenre;
+                filtered = filtered.filter(m => {
+                    const cat = (m.category || '').toLowerCase();
+                    const gen = (genreName || '').toLowerCase();
+                    return cat.includes(gen) || (m.genreIds && m.genreIds.includes(parseInt(currentGenre)));
+                });
+            }
+
+            if (searchQuery) {
+                filtered = filtered.filter(m => 
+                    (m.title || '').toLowerCase().includes(searchQuery) || 
+                    (m.description || '').toLowerCase().includes(searchQuery) ||
+                    (m.category || '').toLowerCase().includes(searchQuery)
+                );
+            }
+
+            renderMovies(filtered);
+        }
+
+        // ─── CARRINHO ────────────────────────────────────────────────────────────────
+        function toggleCartModal() {
+            document.getElementById('cartModal').classList.toggle('hidden');
+            renderCartItems();
+        }
+
+        function addToCart(movieId) {
+            const movie = movies.find(m => m.id === movieId);
+            if (!movie) return;
+            if (cart.find(item => item.id === movieId)) {
+                showToast('Aviso', `${movie.title} já está no carrinho!`, 'warning');
+            } else {
+                cart.push(movie);
+                showToast('Sucesso', `${movie.title} adicionado!`, 'success');
+                updateCartUI();
+            }
+        }
+
+        function quickAddMovie(movieId) {
+            addToCart(movieId);
+            toggleCartModal();
+        }
+
+        function removeFromCart(movieId) {
+            cart = cart.filter(item => item.id !== movieId);
+            updateCartUI();
+            renderCartItems();
+            showToast('Removido', 'Filme removido do carrinho.', 'info');
+        }
+
+        function updateCartUI() {
+            const badge = document.getElementById('cartBadge');
+            const btn   = document.getElementById('checkoutBtn');
+            if (cart.length > 0) {
+                badge.textContent = cart.length;
+                badge.classList.remove('hidden');
+                btn.removeAttribute('disabled');
+            } else {
+                badge.classList.add('hidden');
+                btn.setAttribute('disabled', 'true');
+            }
+        }
+
+        function renderCartItems() {
+            const list  = document.getElementById('cartItemsList');
+            const total = document.getElementById('cartTotalPrice');
+            list.innerHTML = '';
+
+            if (cart.length === 0) {
+                list.innerHTML = `
+                    <div class="py-10 text-center text-slate-500">
+                        <i class="fa-solid fa-bag-shopping text-2xl mb-2 opacity-30"></i>
+                        <p class="text-xs font-semibold">Carrinho vazio.</p>
+                    </div>`;
+                total.textContent = 'R$ 0,00';
+                return;
+            }
+
+            let sum = 0;
+            cart.forEach(item => {
+                sum += item.price;
+                const row = document.createElement('div');
+                row.className = 'py-2.5 flex items-center justify-between text-xs';
+                row.innerHTML = `
+                    <div class="flex items-center space-x-2.5">
+                        <img src="${item.image}" class="w-9 h-12 object-cover rounded-lg bg-slate-800">
+                        <div>
+                            <h4 class="font-bold line-clamp-1 mb-0.5">${item.title}</h4>
+                            <span class="text-brand-400 font-extrabold">R$ ${item.price.toFixed(2).replace('.', ',')}</span>
+                        </div>
+                    </div>
+                    <button onclick="removeFromCart(${item.id})" class="text-slate-400 hover:text-brand-400 p-2 rounded-xl glass-card">
+                        <i class="fa-solid fa-trash-can text-xs"></i>
+                    </button>
+                `;
+                list.appendChild(row);
+            });
+            total.textContent = `R$ ${sum.toFixed(2).replace('.', ',')}`;
+        }
+
+        // ─── DETALHES DO FILME ───────────────────────────────────────────────────────
+        function openMovieDetails(movieId) {
+            const movie = movies.find(m => m.id === movieId);
+            if (!movie) return;
+
+            document.getElementById('movieDetailsContent').innerHTML = `
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <div class="w-32 sm:w-40 aspect-[2/3] rounded-xl overflow-hidden bg-slate-900 flex-shrink-0 mx-auto shadow-lg border border-slate-800">
+                        <img src="${movie.image}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-1 flex flex-col justify-between text-xs sm:text-sm">
+                        <div>
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="px-2 py-0.5 bg-brand-600 text-white text-[9px] font-bold rounded uppercase">${movie.category}</span>
+                                <div class="flex items-center space-x-1 text-amber-400 glass-card px-2 py-0.5 rounded text-[9px] font-bold">
+                                    <i class="fa-solid fa-star"></i><span>${movie.rating}</span>
+                                </div>
+                            </div>
+                            <h2 class="text-base sm:text-lg font-extrabold mb-1.5 text-white">${movie.title}</h2>
+                            <p class="text-slate-300 text-xs leading-relaxed mb-3">${movie.description}</p>
+                        </div>
+                        <div class="flex items-center justify-between pt-3 border-t border-slate-800">
+                            <div>
+                                <span class="block text-[8px] text-slate-400 uppercase font-bold">Preço 4K</span>
+                                <span class="text-sm sm:text-base font-black text-white">R$ ${movie.price.toFixed(2).replace('.', ',')}</span>
+                            </div>
+                            <button onclick="quickAddMovie(${movie.id}); closeMovieDetails();" class="px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs shadow-md transition flex items-center space-x-1">
+                                <i class="fa-solid fa-bag-shopping text-[10px]"></i>
+                                <span>Comprar</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('movieDetailsModal').classList.remove('hidden');
+        }
+
+        function closeMovieDetails() {
+            document.getElementById('movieDetailsModal').classList.add('hidden');
+        }
+
+        // ─── BIBLIOTECA ──────────────────────────────────────────────────────────────
+        function showMyLibrary() {
+            const grid = document.getElementById('movieGrid');
+            document.getElementById('catalogTitle').textContent = 'Meus Filmes Adquiridos';
+            document.getElementById('movieCount').textContent   = `${userLibrary.length} filmes`;
+            grid.innerHTML = '';
+
+            if (userLibrary.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full py-16 text-center text-slate-500">
+                        <i class="fa-solid fa-clapperboard text-3xl mb-2 opacity-30"></i>
+                        <p class="text-xs font-bold text-slate-300 mb-1">Sua biblioteca está vazia.</p>
+                        <p class="text-[10px] text-slate-500">Adquira filmes após o pagamento PIX para assisti-los!</p>
+                    </div>`;
+                return;
+            }
+
+            userLibrary.forEach(movie => {
+                const card = document.createElement('div');
+                card.className = 'glass-card rounded-xl overflow-hidden flex flex-col justify-between shadow-lg border border-slate-800';
+                card.innerHTML = `
+                    <div>
+                        <div class="relative aspect-[2/3] overflow-hidden bg-slate-900">
+                            <img src="${movie.image}" class="w-full h-full object-cover">
+                            <span class="absolute top-2 left-2 bg-emerald-600 text-white text-[8px] px-2 py-0.5 rounded font-bold flex items-center space-x-1">
+                                <i class="fa-solid fa-check text-[8px]"></i><span>Liberado</span>
+                            </span>
+                        </div>
+                        <div class="p-2.5">
+                            <h3 class="font-bold text-xs mb-1 truncate text-white">${movie.title}</h3>
+                            <p class="text-[9px] text-slate-400">Pronto para reprodução 4K</p>
+                        </div>
+                    </div>
+                    <div class="p-2.5 pt-0">
+                        <button onclick="showToast('Reproduzindo', 'Iniciando transmissão de ${movie.title.replace(/'/g,"\\'")}...', 'success')" class="w-full py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] flex items-center justify-center space-x-1.5 transition">
+                            <i class="fa-solid fa-play text-[9px]"></i><span>Assistir Filme</span>
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // ─── NAVEGAÇÃO & SUPORTE ───────────────────────────────────────────────────
+        function navigateTo(target) {
+            if (target === 'home') {
+                document.getElementById('catalogTitle').textContent = 'Catálogo de Filmes';
+                document.getElementById('searchInput').value = '';
+                searchQuery  = '';
+                currentGenre = 'all';
+                renderMovies(movies);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function scrollToHowItWorks() {
+            const el = document.getElementById('howItWorksSection');
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        function openSupportModal() {
+            const modal = document.getElementById('supportModal');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeSupportModal() {
+            const modal = document.getElementById('supportModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        // ─── TOAST ───────────────────────────────────────────────────────────────────
+        let toastTimeout;
+        function showToast(title, message, type = 'success') {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastTitle').textContent   = title;
+            document.getElementById('toastMessage').textContent = message;
+
+            const icon = document.getElementById('toastIcon');
+            const styles = {
+                success: { cls: 'bg-emerald-500/20 text-emerald-400', ico: 'fa-check' },
+                warning: { cls: 'bg-amber-500/20 text-amber-400',   ico: 'fa-triangle-exclamation' },
+                info:    { cls: 'bg-sky-500/20 text-sky-400',        ico: 'fa-info' }
+            };
+            const s = styles[type] || styles.success;
+            icon.className = `w-6 h-6 rounded-lg ${s.cls} flex items-center justify-center font-bold`;
+            icon.innerHTML = `<i class="fa-solid ${s.ico} text-xs"></i>`;
+
+            toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+            }, 3500);
+        }
+    </script>
+</body>
+</html>

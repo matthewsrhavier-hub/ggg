@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "rewrites": [
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/cineadm", "destination": "/admin.html" },
+    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/api/(.*)", "destination": "/api" }
+  ]
+}
