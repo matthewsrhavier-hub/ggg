@@ -1,11 +1,6 @@
 /**
- * CineStore — Servidor proxy local
- * Resolve o problema de CORS fazendo as chamadas à SyncPay
- * de servidor para servidor (sem restrições de CORS).
- *
- * Rotas proxy:
- *   POST /api/syncpay/auth-token  → SyncPay /api/partner/v1/auth-token
- *   POST /api/syncpay/cash-in     → SyncPay /api/partner/v1/cash-in
+ * CineStore — Servidor backend & proxy
+ * Integração Oficial Mercado Pago PIX
  */
 
 const express = require('express');
@@ -15,7 +10,9 @@ const path    = require('path');
 const app  = express();
 const PORT = 3000;
 
-const SYNCPAY_BASE = 'https://api.syncpayments.com.br/api/partner/v1';
+// Token de Acesso Mercado Pago
+const MP_ACCESS_TOKEN = process.env.MP_ACCESS_TOKEN || 'APP_USR-5559492872354691-031314-ead3dcc4182371789f734778c6854e0f-428533934';
+const MP_BASE_URL     = 'https://api.mercadopago.com/v1';
 
 // Parse JSON bodies
 app.use(express.json());
@@ -34,70 +31,88 @@ app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'admin.html'));
 });
 
-// ─── PROXY: Auth Token ────────────────────────────────────────────────────────
-app.post(['/api/syncpay/auth-token', '/syncpay/auth-token'], async (req, res) => {
+// ─── MERCADO PAGO: CRIAR PIX ─────────────────────────────────────────────────
+app.post(['/api/mercadopago/create-pix', '/api/pix/create', '/mercadopago/create-pix'], async (req, res) => {
     try {
-        const response = await fetch(`${SYNCPAY_BASE}/auth-token`, {
-            method:  'POST',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            body:    JSON.stringify(req.body)
-        });
+        const { amount, description, payer_email } = req.body;
+        const transactionAmount = parseFloat(amount) || 1.00;
+        const idempotencyKey = 'cine_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
 
-        const data = await response.json();
-        res.status(response.status).json(data);
-    } catch (err) {
-        console.error('[Proxy Auth]', err.message);
-        res.status(502).json({ message: 'Erro ao conectar com a SyncPay: ' + err.message });
-    }
-});
+        const payload = {
+            transaction_amount: transactionAmount,
+            description: description || 'CineStore - Filmes 4K',
+            payment_method_id: 'pix',
+            payer: {
+                email: payer_email || 'cliente@cinestore.com.br',
+                first_name: 'Cliente',
+                last_name: 'CineStore'
+            }
+        };
 
-// ─── PROXY: Cash-In (PIX) ────────────────────────────────────────────────────
-app.post(['/api/syncpay/cash-in', '/syncpay/cash-in'], async (req, res) => {
-    const authHeader = req.headers['authorization'];
-    if (!authHeader) {
-        return res.status(401).json({ message: 'Token de autorização não fornecido.' });
-    }
-
-    try {
-        const response = await fetch(`${SYNCPAY_BASE}/cash-in`, {
-            method:  'POST',
+        const response = await fetch(`${MP_BASE_URL}/payments`, {
+            method: 'POST',
             headers: {
-                'Content-Type':  'application/json',
-                'Accept':        'application/json',
-                'Authorization': authHeader
+                'Authorization': `Bearer ${MP_ACCESS_TOKEN}`,
+                'Content-Type': 'application/json',
+                'X-Idempotency-Key': idempotencyKey
             },
-            body: JSON.stringify(req.body)
+            body: JSON.stringify(payload)
         });
 
         const data = await response.json();
-        res.status(response.status).json(data);
+        
+        if (!response.ok) {
+            console.error('[MercadoPago Create Error]', data);
+            return res.status(response.status).json({
+                message: data.message || (data.cause && data.cause[0] ? data.cause[0].description : 'Erro ao gerar PIX no Mercado Pago'),
+                data
+            });
+        }
+
+        const txData = data.point_of_interaction?.transaction_data || {};
+        res.json({
+            id: data.id,
+            status: data.status,
+            qr_code: txData.qr_code,
+            qr_code_base64: txData.qr_code_base64,
+            ticket_url: txData.ticket_url
+        });
     } catch (err) {
-        console.error('[Proxy CashIn]', err.message);
-        res.status(502).json({ message: 'Erro ao conectar com a SyncPay: ' + err.message });
+        console.error('[MercadoPago Create Exception]', err.message);
+        res.status(502).json({ message: 'Erro ao conectar com Mercado Pago: ' + err.message });
     }
 });
 
-// ─── PROXY: Consultar Transação ──────────────────────────────────────────────
-app.get(['/api/syncpay/transaction/:identifier', '/syncpay/transaction/:identifier'], async (req, res) => {
-    const authHeader = req.headers['authorization'];
-    if (!authHeader) {
-        return res.status(401).json({ message: 'Token de autorização não fornecido.' });
-    }
-
+// ─── MERCADO PAGO: CONSULTAR STATUS DO PAGAMENTO ─────────────────────────────
+app.get(['/api/mercadopago/payment/:id', '/api/pix/status/:id', '/mercadopago/payment/:id'], async (req, res) => {
     try {
-        const response = await fetch(`${SYNCPAY_BASE}/transaction/${req.params.identifier}`, {
-            method:  'GET',
+        const paymentId = req.params.id;
+        const response = await fetch(`${MP_BASE_URL}/payments/${paymentId}`, {
+            method: 'GET',
             headers: {
-                'Accept':        'application/json',
-                'Authorization': authHeader
+                'Authorization': `Bearer ${MP_ACCESS_TOKEN}`,
+                'Content-Type': 'application/json'
             }
         });
 
         const data = await response.json();
-        res.status(response.status).json(data);
+        
+        if (!response.ok) {
+            console.error('[MercadoPago Status Error]', data);
+            return res.status(response.status).json({
+                message: data.message || 'Erro ao consultar pagamento no Mercado Pago',
+                data
+            });
+        }
+
+        res.json({
+            id: data.id,
+            status: data.status, // "approved", "pending", "rejected", "cancelled"
+            status_detail: data.status_detail
+        });
     } catch (err) {
-        console.error('[Proxy Transaction]', err.message);
-        res.status(502).json({ message: 'Erro ao conectar com a SyncPay: ' + err.message });
+        console.error('[MercadoPago Status Exception]', err.message);
+        res.status(502).json({ message: 'Erro ao conectar com Mercado Pago: ' + err.message });
     }
 });
 
@@ -112,8 +127,8 @@ if (require.main === module) {
         console.log('  ╚██████╗██║██║ ╚████║███████╗███████║   ██║   ╚██████╔╝██║  ██║███████╗');
         console.log('   ╚═════╝╚═╝╚═╝  ╚═══╝╚══════╝╚══════╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝╚══════╝');
         console.log('');
-        console.log(`  🎬  CineStore rodando em → http://localhost:${PORT}`);
-        console.log(`  💳  Proxy PIX ativo       → /api/syncpay/*`);
+        console.log(`  🎬  CineStore rodando em       → http://localhost:${PORT}`);
+        console.log(`  💳  Mercado Pago PIX integrado → /api/mercadopago/*`);
         console.log('');
         console.log('  Abra o navegador em: http://localhost:3000');
         console.log('  Pressione Ctrl+C para parar o servidor.');

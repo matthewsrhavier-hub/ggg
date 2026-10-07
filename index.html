@@ -12,21 +12,17 @@
                 extend: {
                     colors: {
                         brand: {
-                            50: '#eef2ff',
-                            100: '#e0e7ff',
-                            200: '#c7d2fe',
-                            300: '#a5b4fc',
-                            400: '#818cf8',
-                            500: '#6366f1',
-                            600: '#4f46e5',
-                            700: '#4338ca',
-                            800: '#3730a3',
-                            900: '#312e81',
-                            950: '#1e1b4b',
-                        },
-                        cyan: {
-                            400: '#38bdf8',
-                            500: '#06b6d4',
+                            50: '#fff1f2',
+                            100: '#ffe4e6',
+                            200: '#fecdd3',
+                            300: '#fda4af',
+                            400: '#fb7185',
+                            500: '#f43f5e',
+                            600: '#e50914',
+                            700: '#b91c1c',
+                            800: '#991b1b',
+                            900: '#7f1d1d',
+                            950: '#450a0a',
                         }
                     }
                 }
@@ -38,51 +34,63 @@
     <!-- Supabase JS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #070709;
+            background-image: radial-gradient(circle at 50% -10%, rgba(229, 9, 20, 0.18) 0%, transparent 55%),
+                              radial-gradient(circle at 100% 60%, rgba(185, 28, 28, 0.08) 0%, transparent 45%);
+            background-attachment: fixed;
+        }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .glass-panel {
-            background: rgba(13, 18, 36, 0.85);
+            background: rgba(13, 13, 17, 0.88);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
         .glass-card {
-            background: rgba(22, 30, 56, 0.6);
+            background: rgba(18, 18, 24, 0.65);
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.07);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card:hover {
+            border-color: rgba(229, 9, 20, 0.4);
+            box-shadow: 0 10px 25px -5px rgba(229, 9, 20, 0.18);
         }
     </style>
 </head>
-<body class="bg-[#070b14] text-slate-100 min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-white antialiased">
+<body class="text-slate-100 min-h-screen flex flex-col justify-between selection:bg-red-600 selection:text-white antialiased">
 
-    <header class="sticky top-0 z-40 glass-panel border-b border-indigo-950/60">
+    <header class="sticky top-0 z-40 glass-panel border-b border-red-950/40">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-3 cursor-pointer group" onclick="navigateTo('home')">
-                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 via-indigo-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-brand-500/25 group-hover:scale-105 transition">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-red-700 via-red-600 to-rose-500 flex items-center justify-center shadow-lg shadow-red-600/30 group-hover:scale-105 group-hover:shadow-red-600/50 transition duration-300">
                     <i class="fa-solid fa-clapperboard text-white text-xs"></i>
                 </div>
                 <div>
                     <span class="text-base font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text text-transparent">CineStore</span>
-                    <span class="block text-[8px] text-cyan-400 font-bold uppercase tracking-widest flex items-center space-x-1">
-                        <span class="w-1 h-1 rounded-full bg-cyan-400 mr-1 animate-pulse"></span>
+                    <span class="block text-[8px] text-red-400 font-bold uppercase tracking-widest flex items-center space-x-1">
+                        <span class="w-1 h-1 rounded-full bg-red-500 mr-1 animate-pulse"></span>
                         PIX 4K Instantâneo
                     </span>
                 </div>
             </div>
 
             <div class="hidden md:flex items-center space-x-6 text-xs font-semibold">
-                <button onclick="navigateTo('home')" class="hover:text-brand-400 transition">Início</button>
-                <button onclick="filterCategory('all')" class="hover:text-brand-400 transition">Catálogo</button>
-                <button onclick="showMyLibrary()" class="hover:text-brand-400 transition flex items-center space-x-1.5">
-                    <i class="fa-solid fa-film text-xs text-brand-500"></i>
+                <button onclick="navigateTo('home')" class="hover:text-red-400 transition">Início</button>
+                <button onclick="filterCategory('all')" class="hover:text-red-400 transition">Catálogo</button>
+                <button onclick="showMyLibrary()" class="hover:text-red-400 transition flex items-center space-x-1.5">
+                    <i class="fa-solid fa-film text-xs text-red-500"></i>
                     <span>Meus Filmes</span>
                 </button>
-                <button onclick="scrollToHowItWorks()" class="hover:text-brand-400 transition flex items-center space-x-1.5 text-slate-300">
+                <button onclick="scrollToHowItWorks()" class="hover:text-red-400 transition flex items-center space-x-1.5 text-slate-300">
                     <i class="fa-solid fa-circle-question text-xs text-amber-400"></i>
                     <span>Como Comprar</span>
                 </button>
-                <button onclick="openSupportModal()" class="hover:text-brand-400 transition flex items-center space-x-1.5 text-slate-300">
+                <button onclick="openSupportModal()" class="hover:text-red-400 transition flex items-center space-x-1.5 text-slate-300">
                     <i class="fa-solid fa-headset text-xs text-emerald-400"></i>
                     <span>Suporte</span>
                 </button>
@@ -90,19 +98,19 @@
 
             <div class="flex items-center space-x-2.5">
                 <div class="relative hidden sm:block">
-                    <input type="text" id="searchInput" oninput="handleSearch(this.value)" placeholder="Pesquisar..." class="bg-slate-900/90 text-xs rounded-xl pl-9 pr-3 py-2 w-40 lg:w-52 focus:outline-none focus:ring-2 focus:ring-brand-500 border border-slate-800 transition">
-                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                    <input type="text" id="searchInput" oninput="handleSearch(this.value)" placeholder="Pesquisar..." class="bg-black/60 text-xs rounded-xl pl-9 pr-3 py-2 w-40 lg:w-52 focus:outline-none focus:ring-2 focus:ring-red-600 border border-neutral-800 transition">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-neutral-400 text-xs"></i>
                 </div>
-                <button onclick="toggleCartModal()" class="relative p-2 rounded-xl glass-card hover:bg-slate-800 transition group">
-                    <i class="fa-solid fa-bag-shopping text-slate-300 group-hover:text-brand-400 transition text-sm"></i>
-                    <span id="cartBadge" class="absolute -top-1 -right-1 bg-brand-600 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-extrabold shadow-md hidden">0</span>
+                <button onclick="toggleCartModal()" class="relative p-2 rounded-xl glass-card hover:bg-neutral-800 transition group">
+                    <i class="fa-solid fa-bag-shopping text-slate-300 group-hover:text-red-400 transition text-sm"></i>
+                    <span id="cartBadge" class="absolute -top-1 -right-1 bg-red-600 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-extrabold shadow-md shadow-red-600/50 hidden">0</span>
                 </button>
             </div>
         </div>
         <div class="px-4 pb-3 sm:hidden">
             <div class="relative w-full">
-                <input type="text" oninput="handleSearch(this.value)" placeholder="Pesquisar filmes..." class="bg-slate-900/90 text-xs rounded-xl pl-9 pr-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-brand-500 border border-slate-800">
-                <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                <input type="text" oninput="handleSearch(this.value)" placeholder="Pesquisar filmes..." class="bg-black/60 text-xs rounded-xl pl-9 pr-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-red-600 border border-neutral-800">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-neutral-400 text-xs"></i>
             </div>
         </div>
     </header>
@@ -110,32 +118,32 @@
     <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full space-y-6">
         
         <!-- Hero Section -->
-        <section id="heroSection" class="relative rounded-2xl overflow-hidden glass-panel border border-slate-800/80 p-5 sm:p-8 md:p-10 shadow-xl min-h-[300px] flex flex-col justify-end">
-            <div id="heroBg" class="absolute inset-0 opacity-20 bg-cover bg-center transition-all duration-700"></div>
-            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent"></div>
+        <section id="heroSection" class="relative rounded-3xl overflow-hidden glass-panel border border-red-900/30 p-5 sm:p-8 md:p-10 shadow-2xl min-h-[320px] flex flex-col justify-end">
+            <div id="heroBg" class="absolute inset-0 opacity-25 bg-cover bg-center transition-all duration-700"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-[#070709] via-[#070709]/70 to-transparent"></div>
             <div class="relative z-10 max-w-lg" id="heroContent">
-                <span class="inline-block px-3 py-1 rounded-full bg-brand-500/10 text-brand-400 border border-brand-500/30 text-[10px] font-bold uppercase tracking-wider mb-2">
-                    Destaque TMDB 4K
+                <span class="inline-block px-3 py-1 rounded-full bg-red-600/20 text-red-400 border border-red-500/40 text-[10px] font-bold uppercase tracking-wider mb-2 shadow-sm">
+                    Destaque Cinema 4K
                 </span>
-                <h1 id="heroTitle" class="text-xl sm:text-3xl font-extrabold tracking-tight mb-2 text-white">Carregando...</h1>
+                <h1 id="heroTitle" class="text-xl sm:text-3xl font-black tracking-tight mb-2 text-white">Carregando...</h1>
                 <p id="heroDesc" class="text-slate-300 text-xs sm:text-sm mb-4 leading-relaxed line-clamp-2">Buscando os melhores lançamentos em tempo real...</p>
                 <div class="flex flex-wrap gap-2.5" id="heroButtons"></div>
             </div>
         </section>
 
         <!-- How It Works Section (Como Funciona em 3 Passos - Carrossel no Mobile) -->
-        <section id="howItWorksSection" class="p-4 sm:p-7 rounded-2xl glass-panel border border-slate-800/80 shadow-lg">
-            <div class="flex items-center justify-between pb-3.5 border-b border-slate-800/80 mb-4 gap-2">
+        <section id="howItWorksSection" class="p-4 sm:p-7 rounded-3xl glass-panel border border-red-950/30 shadow-xl">
+            <div class="flex items-center justify-between pb-3.5 border-b border-neutral-800/80 mb-4 gap-2">
                 <div>
-                    <span class="text-[10px] uppercase font-extrabold text-brand-400 tracking-wider">Passo a Passo Simples</span>
+                    <span class="text-[10px] uppercase font-black text-red-500 tracking-wider">Passo a Passo Simples</span>
                     <h2 class="text-sm sm:text-lg font-black text-white">Como comprar e assistir?</h2>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <span class="text-[10px] text-slate-400 font-medium sm:hidden flex items-center space-x-1 bg-slate-900/80 px-2 py-1 rounded-lg border border-slate-800">
+                    <span class="text-[10px] text-slate-400 font-medium sm:hidden flex items-center space-x-1 bg-black/80 px-2 py-1 rounded-lg border border-neutral-800">
                         <span>Deslize</span>
-                        <i class="fa-solid fa-arrow-right text-[8px] text-cyan-400"></i>
+                        <i class="fa-solid fa-arrow-right text-[8px] text-red-400"></i>
                     </span>
-                    <button onclick="openSupportModal()" class="px-3 py-1.5 rounded-xl glass-card hover:bg-slate-800 text-slate-300 hover:text-white text-xs font-semibold hidden sm:flex items-center space-x-1.5 transition">
+                    <button onclick="openSupportModal()" class="px-3 py-1.5 rounded-xl glass-card hover:bg-neutral-800 text-slate-300 hover:text-white text-xs font-semibold hidden sm:flex items-center space-x-1.5 transition">
                         <i class="fa-solid fa-headset text-emerald-400 text-xs"></i>
                         <span>Precisa de Ajuda?</span>
                     </button>
@@ -146,30 +154,30 @@
             <div class="flex overflow-x-auto hide-scrollbar gap-3 pb-1 snap-x snap-mandatory md:grid md:grid-cols-3 md:gap-4 md:overflow-visible">
                 
                 <!-- Step 1 -->
-                <div class="min-w-[84%] sm:min-w-[70%] md:min-w-0 snap-start flex-shrink-0 md:flex-shrink p-4 rounded-2xl glass-card border border-slate-800/80 flex flex-col justify-between hover:border-brand-500/40 transition">
+                <div class="min-w-[84%] sm:min-w-[70%] md:min-w-0 snap-start flex-shrink-0 md:flex-shrink p-4 rounded-2xl glass-card border border-neutral-800/80 flex flex-col justify-between hover:border-red-500/50 transition">
                     <div class="space-y-2.5">
                         <div class="flex items-center justify-between">
-                            <div class="w-9 h-9 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-400 font-black text-sm">
+                            <div class="w-9 h-9 rounded-xl bg-red-600/15 border border-red-500/30 flex items-center justify-center text-red-400 font-black text-sm">
                                 1
                             </div>
                             <span class="text-[9px] text-slate-500 uppercase font-bold sm:hidden">Etapa 1 de 3</span>
                         </div>
                         <h3 class="font-extrabold text-sm text-white flex items-center space-x-2">
                             <span>Escolha o Filme</span>
-                            <i class="fa-solid fa-film text-brand-400 text-xs"></i>
+                            <i class="fa-solid fa-film text-red-400 text-xs"></i>
                         </h3>
                         <p class="text-xs text-slate-300 leading-relaxed">
-                            Navegue pelo catálogo com milhares de lançamentos em <strong class="text-white">4K Ultra HD</strong> e adicione ao carrinho.
+                            Navegue pelo catálogo com lançamentos em <strong class="text-white">4K Ultra HD</strong> e adicione ao carrinho.
                         </p>
                     </div>
                     <div class="mt-3 text-[10px] text-slate-500 font-medium">Sem assinaturas fixas</div>
                 </div>
 
                 <!-- Step 2 -->
-                <div class="min-w-[84%] sm:min-w-[70%] md:min-w-0 snap-start flex-shrink-0 md:flex-shrink p-4 rounded-2xl glass-card border border-slate-800/80 flex flex-col justify-between hover:border-emerald-500/40 transition">
+                <div class="min-w-[84%] sm:min-w-[70%] md:min-w-0 snap-start flex-shrink-0 md:flex-shrink p-4 rounded-2xl glass-card border border-neutral-800/80 flex flex-col justify-between hover:border-emerald-500/50 transition">
                     <div class="space-y-2.5">
                         <div class="flex items-center justify-between">
-                            <div class="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-black text-sm">
+                            <div class="w-9 h-9 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-black text-sm">
                                 2
                             </div>
                             <span class="text-[9px] text-emerald-400/80 uppercase font-bold sm:hidden">Etapa 2 de 3</span>
@@ -179,7 +187,7 @@
                             <i class="fa-solid fa-bolt text-emerald-400 text-xs"></i>
                         </h3>
                         <p class="text-xs text-slate-300 leading-relaxed">
-                            <strong class="text-emerald-400">Zero formulários!</strong> Não precisa de CPF, email longo ou cartão. O QR Code é gerado na hora.
+                            <strong class="text-emerald-400">Zero formulários!</strong> Não precisa de CPF, email longo ou cartão. QR Code imediato.
                         </p>
                     </div>
                     <div class="mt-3 text-[10px] text-emerald-400/80 font-medium flex items-center space-x-1">
@@ -189,10 +197,10 @@
                 </div>
 
                 <!-- Step 3 -->
-                <div class="min-w-[84%] sm:min-w-[70%] md:min-w-0 snap-start flex-shrink-0 md:flex-shrink p-4 rounded-2xl glass-card border border-slate-800/80 flex flex-col justify-between hover:border-amber-500/40 transition">
+                <div class="min-w-[84%] sm:min-w-[70%] md:min-w-0 snap-start flex-shrink-0 md:flex-shrink p-4 rounded-2xl glass-card border border-neutral-800/80 flex flex-col justify-between hover:border-amber-500/50 transition">
                     <div class="space-y-2.5">
                         <div class="flex items-center justify-between">
-                            <div class="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 font-black text-sm">
+                            <div class="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 font-black text-sm">
                                 3
                             </div>
                             <span class="text-[9px] text-amber-400/80 uppercase font-bold sm:hidden">Etapa 3 de 3</span>
@@ -202,7 +210,7 @@
                             <i class="fa-solid fa-play text-amber-400 text-xs"></i>
                         </h3>
                         <p class="text-xs text-slate-300 leading-relaxed">
-                            O sistema detecta o pagamento <strong class="text-white">em segundos</strong> e libera o título na aba <strong class="text-brand-400">"Meus Filmes"</strong>.
+                            O sistema detecta o pagamento <strong class="text-white">em segundos</strong> e libera o título na aba <strong class="text-red-400">"Meus Filmes"</strong>.
                         </p>
                     </div>
                     <div class="mt-3 text-[10px] text-amber-400/80 font-medium flex items-center space-x-1">
@@ -217,54 +225,54 @@
         <div class="space-y-2.5">
             <div class="flex items-center justify-between px-1">
                 <div class="flex items-center space-x-2">
-                    <i class="fa-solid fa-layer-group text-cyan-400 text-xs"></i>
+                    <i class="fa-solid fa-layer-group text-red-500 text-xs"></i>
                     <h3 class="text-xs sm:text-sm font-extrabold text-slate-200">Explorar por Gênero</h3>
                 </div>
                 <span class="text-[10px] text-slate-400 font-medium sm:hidden flex items-center space-x-1">
                     <span>Deslize</span>
-                    <i class="fa-solid fa-arrow-right-long text-[9px] text-cyan-400"></i>
+                    <i class="fa-solid fa-arrow-right-long text-[9px] text-red-400"></i>
                 </span>
             </div>
 
             <div class="flex items-center space-x-2 overflow-x-auto hide-scrollbar pb-2 pt-0.5 px-0.5" id="categoryFilters">
-                <button onclick="filterCategory('all')" class="cat-btn flex items-center space-x-1.5 px-3.5 py-2 rounded-xl font-extrabold text-xs bg-gradient-to-r from-brand-600 via-indigo-600 to-cyan-500 text-white shadow-lg shadow-brand-500/25 transition whitespace-nowrap flex-shrink-0 scale-100">
+                <button onclick="filterCategory('all')" class="cat-btn flex items-center space-x-1.5 px-3.5 py-2 rounded-xl font-extrabold text-xs bg-gradient-to-r from-red-600 via-rose-600 to-red-700 text-white shadow-lg shadow-red-600/30 transition whitespace-nowrap flex-shrink-0 scale-100">
                     <i class="fa-solid fa-clapperboard text-xs"></i>
                     <span>Todos os Filmes</span>
                 </button>
-                <button onclick="filterCategory('28')" class="cat-btn flex items-center space-x-1.5 px-3.5 py-2 rounded-xl font-bold text-xs glass-card text-slate-300 hover:text-white hover:bg-slate-800 transition whitespace-nowrap flex-shrink-0">
+                <button onclick="filterCategory('28')" class="cat-btn flex items-center space-x-1.5 px-3.5 py-2 rounded-xl font-bold text-xs glass-card text-slate-300 hover:text-white hover:bg-neutral-800 transition whitespace-nowrap flex-shrink-0">
                     <i class="fa-solid fa-fire-flame-curved text-xs text-amber-400"></i>
                     <span>Ação</span>
                 </button>
-                <button onclick="filterCategory('878')" class="cat-btn flex items-center space-x-1.5 px-3.5 py-2 rounded-xl font-bold text-xs glass-card text-slate-300 hover:text-white hover:bg-slate-800 transition whitespace-nowrap flex-shrink-0">
-                    <i class="fa-solid fa-rocket text-xs text-cyan-400"></i>
+                <button onclick="filterCategory('878')" class="cat-btn flex items-center space-x-1.5 px-3.5 py-2 rounded-xl font-bold text-xs glass-card text-slate-300 hover:text-white hover:bg-neutral-800 transition whitespace-nowrap flex-shrink-0">
+                    <i class="fa-solid fa-rocket text-xs text-red-400"></i>
                     <span>Ficção</span>
                 </button>
-                <button onclick="filterCategory('18')" class="cat-btn flex items-center space-x-1.5 px-3.5 py-2 rounded-xl font-bold text-xs glass-card text-slate-300 hover:text-white hover:bg-slate-800 transition whitespace-nowrap flex-shrink-0">
+                <button onclick="filterCategory('18')" class="cat-btn flex items-center space-x-1.5 px-3.5 py-2 rounded-xl font-bold text-xs glass-card text-slate-300 hover:text-white hover:bg-neutral-800 transition whitespace-nowrap flex-shrink-0">
                     <i class="fa-solid fa-masks-theater text-xs text-purple-400"></i>
                     <span>Drama</span>
                 </button>
-                <button onclick="filterCategory('16')" class="cat-btn flex items-center space-x-1.5 px-3.5 py-2 rounded-xl font-bold text-xs glass-card text-slate-300 hover:text-white hover:bg-slate-800 transition whitespace-nowrap flex-shrink-0">
+                <button onclick="filterCategory('16')" class="cat-btn flex items-center space-x-1.5 px-3.5 py-2 rounded-xl font-bold text-xs glass-card text-slate-300 hover:text-white hover:bg-neutral-800 transition whitespace-nowrap flex-shrink-0">
                     <i class="fa-solid fa-wand-magic-sparkles text-xs text-pink-400"></i>
                     <span>Animação</span>
                 </button>
-                <button onclick="filterCategory('27')" class="cat-btn flex items-center space-x-1.5 px-3.5 py-2 rounded-xl font-bold text-xs glass-card text-slate-300 hover:text-white hover:bg-slate-800 transition whitespace-nowrap flex-shrink-0">
+                <button onclick="filterCategory('27')" class="cat-btn flex items-center space-x-1.5 px-3.5 py-2 rounded-xl font-bold text-xs glass-card text-slate-300 hover:text-white hover:bg-neutral-800 transition whitespace-nowrap flex-shrink-0">
                     <i class="fa-solid fa-ghost text-xs text-emerald-400"></i>
                     <span>Terror</span>
                 </button>
-                <button onclick="filterCategory('35')" class="cat-btn flex items-center space-x-1.5 px-3.5 py-2 rounded-xl font-bold text-xs glass-card text-slate-300 hover:text-white hover:bg-slate-800 transition whitespace-nowrap flex-shrink-0">
+                <button onclick="filterCategory('35')" class="cat-btn flex items-center space-x-1.5 px-3.5 py-2 rounded-xl font-bold text-xs glass-card text-slate-300 hover:text-white hover:bg-neutral-800 transition whitespace-nowrap flex-shrink-0">
                     <i class="fa-solid fa-face-laugh-squint text-xs text-yellow-400"></i>
                     <span>Comédia</span>
                 </button>
-                <button onclick="filterCategory('12')" class="cat-btn flex items-center space-x-1.5 px-3.5 py-2 rounded-xl font-bold text-xs glass-card text-slate-300 hover:text-white hover:bg-slate-800 transition whitespace-nowrap flex-shrink-0">
+                <button onclick="filterCategory('12')" class="cat-btn flex items-center space-x-1.5 px-3.5 py-2 rounded-xl font-bold text-xs glass-card text-slate-300 hover:text-white hover:bg-neutral-800 transition whitespace-nowrap flex-shrink-0">
                     <i class="fa-solid fa-compass text-xs text-sky-400"></i>
                     <span>Aventura</span>
                 </button>
-                <button onclick="filterCategory('80')" class="cat-btn flex items-center space-x-1.5 px-3.5 py-2 rounded-xl font-bold text-xs glass-card text-slate-300 hover:text-white hover:bg-slate-800 transition whitespace-nowrap flex-shrink-0">
-                    <i class="fa-solid fa-user-secret text-xs text-red-400"></i>
+                <button onclick="filterCategory('80')" class="cat-btn flex items-center space-x-1.5 px-3.5 py-2 rounded-xl font-bold text-xs glass-card text-slate-300 hover:text-white hover:bg-neutral-800 transition whitespace-nowrap flex-shrink-0">
+                    <i class="fa-solid fa-user-secret text-xs text-rose-400"></i>
                     <span>Crime</span>
                 </button>
-                <button onclick="filterCategory('10749')" class="cat-btn flex items-center space-x-1.5 px-3.5 py-2 rounded-xl font-bold text-xs glass-card text-slate-300 hover:text-white hover:bg-slate-800 transition whitespace-nowrap flex-shrink-0">
-                    <i class="fa-solid fa-heart text-xs text-rose-400"></i>
+                <button onclick="filterCategory('10749')" class="cat-btn flex items-center space-x-1.5 px-3.5 py-2 rounded-xl font-bold text-xs glass-card text-slate-300 hover:text-white hover:bg-neutral-800 transition whitespace-nowrap flex-shrink-0">
+                    <i class="fa-solid fa-heart text-xs text-red-500"></i>
                     <span>Romance</span>
                 </button>
             </div>
@@ -278,83 +286,29 @@
             </div>
             <div id="movieGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
                 <div class="col-span-full py-16 text-center text-slate-400">
-                    <i class="fa-solid fa-circle-notch fa-spin text-2xl text-brand-500 mb-2"></i>
-                    <p class="text-xs font-semibold">Conectando ao TMDB...</p>
+                    <i class="fa-solid fa-circle-notch fa-spin text-2xl text-red-500 mb-2"></i>
+                    <p class="text-xs font-semibold">Carregando catálogo...</p>
                 </div>
             </div>
         </div>
 
-        <!-- Support & FAQ Preview Section -->
-        <section id="supportSection" class="rounded-2xl glass-panel border border-slate-800/80 p-5 sm:p-7 shadow-lg space-y-4">
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-slate-800/80">
-                <div>
-                    <span class="text-[10px] uppercase font-extrabold text-emerald-400 tracking-wider flex items-center space-x-1">
-                        <i class="fa-solid fa-circle-check text-[8px]"></i>
-                        <span>Central de Atendimento</span>
-                    </span>
-                    <h2 class="text-base sm:text-lg font-black text-white">Dúvidas Frequentes & Suporte</h2>
-                </div>
-                <div class="flex items-center space-x-2">
-                    <a href="https://wa.me/5551999999999?text=Ol%C3%A1%2C%20preciso%20de%20ajuda%20com%20um%20filme%20no%20CineStore" target="_blank" class="px-3.5 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/40 font-bold text-xs transition flex items-center space-x-1.5">
-                        <i class="fa-brands fa-whatsapp text-sm"></i>
-                        <span>WhatsApp Suporte</span>
-                    </a>
-                    <button onclick="openSupportModal()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition flex items-center space-x-1.5">
-                        <i class="fa-solid fa-circle-info text-xs"></i>
-                        <span>Ver FAQ Completo</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Fast FAQs -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 space-y-1">
-                    <h4 class="font-bold text-white flex items-center space-x-1.5">
-                        <i class="fa-solid fa-circle-question text-brand-400 text-xs"></i>
-                        <span>Preciso criar conta para comprar?</span>
-                    </h4>
-                    <p class="text-slate-400 text-[11px] leading-relaxed">
-                        Não é obrigatório! Você pode gerar o PIX direto e o filme será liberado na sua biblioteca local. O login serve apenas para sincronizar seus filmes se desejar.
-                    </p>
-                </div>
-
-                <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 space-y-1">
-                    <h4 class="font-bold text-white flex items-center space-x-1.5">
-                        <i class="fa-solid fa-clock text-emerald-400 text-xs"></i>
-                        <span>Quanto tempo demora para liberar o filme?</span>
-                    </h4>
-                    <p class="text-slate-400 text-[11px] leading-relaxed">
-                        O PIX compensa em <strong>1 a 10 segundos</strong>. Nosso sistema consulta o gateway bancário em tempo real e libera o player automaticamente assim que o banco confirma.
-                    </p>
-                </div>
-            </div>
-        </section>
-
     </main>
 
-    <!-- Support Floating Button -->
-    <button onclick="openSupportModal()" class="fixed bottom-5 left-5 z-40 px-3.5 py-2.5 rounded-full bg-slate-900/90 border border-slate-700/80 text-white font-bold text-xs shadow-2xl backdrop-blur-md hover:border-emerald-400 hover:text-emerald-400 hover:scale-105 transition flex items-center space-x-2 group">
-        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-        <i class="fa-solid fa-headset text-sm text-emerald-400"></i>
-        <span class="text-[11px]">Suporte & Ajuda</span>
-    </button>
-
-    <footer class="glass-panel border-t border-slate-800/80 mt-10 py-6 text-xs text-slate-400">
+    <footer class="glass-panel border-t border-neutral-800/80 mt-10 py-6 text-xs text-slate-400">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex items-center space-x-2">
-                <div class="w-6 h-6 rounded-lg bg-brand-600 flex items-center justify-center text-white text-[10px]">
+                <div class="w-6 h-6 rounded-lg bg-red-600 flex items-center justify-center text-white text-[10px]">
                     <i class="fa-solid fa-clapperboard"></i>
                 </div>
                 <span class="font-bold text-slate-200">CineStore &copy; 2026</span>
                 <span class="text-slate-600">•</span>
-                <span class="text-slate-400">Pagamentos instantâneos via PIX 24h</span>
+                <span class="text-slate-400">Todos os filmes com liberação imediata via PIX</span>
             </div>
             <div class="flex items-center space-x-4 text-slate-400 font-semibold text-[11px]">
                 <button onclick="scrollToHowItWorks()" class="hover:text-white transition">Como Funciona</button>
-                <button onclick="openSupportModal()" class="hover:text-white transition">Suporte Técnico</button>
                 <span class="inline-flex items-center text-emerald-400">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5"></span>
-                    Gateway PIX Operacional
+                    PIX Instantâneo Ativo
                 </span>
             </div>
         </div>
@@ -362,26 +316,26 @@
 
     <!-- Cart Modal -->
     <div id="cartModal" class="fixed inset-0 z-50 overflow-hidden hidden">
-        <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-md transition-opacity" onclick="toggleCartModal()"></div>
+        <div class="absolute inset-0 bg-black/85 backdrop-blur-md transition-opacity" onclick="toggleCartModal()"></div>
         <div class="absolute inset-x-0 bottom-0 sm:inset-x-auto sm:inset-y-0 sm:right-0 max-w-full flex sm:pl-10">
-            <div class="w-full sm:w-[380px] bg-slate-900/95 backdrop-blur-xl border-t sm:border-t-0 sm:border-l border-slate-800 rounded-t-3xl sm:rounded-none p-4 sm:p-6 flex flex-col justify-between shadow-2xl max-h-[85vh] sm:max-h-full">
+            <div class="w-full sm:w-[390px] bg-[#0c0c10]/95 backdrop-blur-2xl border-t sm:border-t-0 sm:border-l border-neutral-800 rounded-t-3xl sm:rounded-none p-4 sm:p-6 flex flex-col justify-between shadow-2xl max-h-[85vh] sm:max-h-full">
                 <div>
-                    <div class="w-10 h-1 bg-slate-700 rounded-full mx-auto mb-3 sm:hidden"></div>
-                    <div class="flex items-center justify-between pb-3 border-b border-slate-800">
-                        <h3 class="text-sm font-extrabold flex items-center space-x-2">
-                            <i class="fa-solid fa-bag-shopping text-brand-500"></i>
+                    <div class="w-10 h-1 bg-neutral-700 rounded-full mx-auto mb-3 sm:hidden"></div>
+                    <div class="flex items-center justify-between pb-3 border-b border-neutral-800">
+                        <h3 class="text-sm font-black flex items-center space-x-2 text-white">
+                            <i class="fa-solid fa-bag-shopping text-red-500"></i>
                             <span>Seu Carrinho</span>
                         </h3>
                         <button onclick="toggleCartModal()" class="text-slate-400 hover:text-white p-2 rounded-xl glass-card"><i class="fa-solid fa-xmark text-xs"></i></button>
                     </div>
-                    <div id="cartItemsList" class="divide-y divide-slate-800/60 max-h-[45vh] sm:max-h-[60vh] overflow-y-auto my-2 pr-1"></div>
+                    <div id="cartItemsList" class="divide-y divide-neutral-800/80 max-h-[45vh] sm:max-h-[60vh] overflow-y-auto my-2 pr-1"></div>
                 </div>
-                <div class="pt-3 border-t border-slate-800 bg-slate-900/95">
+                <div class="pt-3 border-t border-neutral-800 bg-[#0c0c10]">
                     <div class="flex justify-between items-center text-sm font-semibold mb-3">
                         <span class="text-slate-400 text-xs">Total:</span>
-                        <span id="cartTotalPrice" class="text-brand-400 text-lg font-black">R$ 0,00</span>
+                        <span id="cartTotalPrice" class="text-red-500 text-lg font-black">R$ 0,00</span>
                     </div>
-                    <button onclick="proceedToCheckout()" id="checkoutBtn" disabled class="w-full py-3 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs shadow-lg shadow-brand-600/30 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2">
+                    <button onclick="proceedToCheckout()" id="checkoutBtn" disabled class="w-full py-3 rounded-xl bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:to-rose-500 text-white font-black text-xs shadow-lg shadow-red-600/30 transition disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center space-x-2">
                         <span>Pagar com PIX Instantâneo</span>
                         <i class="fa-solid fa-arrow-right text-xs"></i>
                     </button>
@@ -392,12 +346,12 @@
 
     <!-- PIX Checkout Modal -->
     <div id="checkoutModal" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
-        <div class="absolute inset-0 bg-slate-950/85 backdrop-blur-md" onclick="toggleCheckoutModal()"></div>
-        <div class="relative bg-slate-900/95 backdrop-blur-xl border-t sm:border border-slate-800 rounded-t-3xl sm:rounded-2xl max-w-md w-full p-4 sm:p-6 shadow-2xl z-10 max-h-[90vh] overflow-y-auto">
-            <div class="w-10 h-1 bg-slate-700 rounded-full mx-auto mb-3 sm:hidden"></div>
-            <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
-                <h3 class="text-sm font-extrabold flex items-center space-x-2">
-                    <i class="fa-solid fa-qrcode text-emerald-400"></i>
+        <div class="absolute inset-0 bg-black/85 backdrop-blur-md" onclick="toggleCheckoutModal()"></div>
+        <div class="relative bg-[#0c0c10]/95 backdrop-blur-2xl border-t sm:border border-red-950/40 rounded-t-3xl sm:rounded-3xl max-w-md w-full p-4 sm:p-6 shadow-2xl z-10 max-h-[90vh] overflow-y-auto">
+            <div class="w-10 h-1 bg-neutral-700 rounded-full mx-auto mb-3 sm:hidden"></div>
+            <div class="flex items-center justify-between pb-3 border-b border-neutral-800 mb-4">
+                <h3 class="text-sm font-black flex items-center space-x-2 text-white">
+                    <i class="fa-solid fa-qrcode text-red-500"></i>
                     <span>Pagamento via PIX 4K</span>
                 </h3>
                 <button onclick="toggleCheckoutModal()" class="text-slate-400 hover:text-white p-2 rounded-xl glass-card"><i class="fa-solid fa-xmark text-xs"></i></button>
@@ -408,7 +362,7 @@
 
                 <!-- Loading state -->
                 <div id="pixLoading" class="py-10 text-center space-y-3">
-                    <i class="fa-solid fa-circle-notch fa-spin text-3xl text-brand-500"></i>
+                    <i class="fa-solid fa-circle-notch fa-spin text-3xl text-red-500"></i>
                     <p class="text-slate-400 font-semibold text-xs">Gerando seu PIX...</p>
                 </div>
 
@@ -416,65 +370,58 @@
                 <div id="pixReady" class="hidden space-y-3.5">
                     
                     <!-- 3 Quick Step Icons -->
-                    <div class="grid grid-cols-3 gap-2 text-center text-[10px] bg-slate-950/80 p-2.5 rounded-xl border border-slate-800">
+                    <div class="grid grid-cols-3 gap-2 text-center text-[10px] bg-black/80 p-2.5 rounded-xl border border-neutral-800">
                         <div class="space-y-1">
-                            <span class="w-5 h-5 rounded-full bg-brand-500/20 text-brand-400 font-bold inline-flex items-center justify-center text-[9px]">1</span>
+                            <span class="w-5 h-5 rounded-full bg-red-600/20 text-red-400 font-black inline-flex items-center justify-center text-[9px]">1</span>
                             <p class="text-slate-400 font-medium">Copie o código</p>
                         </div>
                         <div class="space-y-1">
-                            <span class="w-5 h-5 rounded-full bg-brand-500/20 text-brand-400 font-bold inline-flex items-center justify-center text-[9px]">2</span>
+                            <span class="w-5 h-5 rounded-full bg-red-600/20 text-red-400 font-black inline-flex items-center justify-center text-[9px]">2</span>
                             <p class="text-slate-400 font-medium">Pague no Banco</p>
                         </div>
                         <div class="space-y-1">
-                            <span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold inline-flex items-center justify-center text-[9px]">3</span>
+                            <span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-black inline-flex items-center justify-center text-[9px]">3</span>
                             <p class="text-emerald-400 font-bold">Auto-Liberação</p>
                         </div>
                     </div>
 
-                    <div class="p-4 rounded-2xl bg-slate-950 border border-slate-800 text-center space-y-3">
+                    <div class="p-4 rounded-2xl bg-black border border-neutral-800 text-center space-y-3">
                         <div class="flex items-center justify-between">
                             <span class="text-[10px] text-slate-400 font-bold uppercase">Aguardando Pagamento</span>
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 animate-pulse">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold bg-red-600/20 text-red-400 border border-red-500/30 animate-pulse">
                                 <i class="fa-solid fa-bolt mr-1"></i> PIX Instantâneo Ativo
                             </span>
                         </div>
 
-                        <div class="bg-white p-3 rounded-xl w-36 h-36 mx-auto flex items-center justify-center shadow-inner">
+                        <div class="bg-white p-3 rounded-2xl w-36 h-36 mx-auto flex items-center justify-center shadow-inner">
                             <img id="pixQrCodeImg" src="" alt="QR Code PIX" class="w-full h-full object-contain">
                         </div>
 
                         <div class="space-y-1">
                             <label class="block font-bold text-slate-400 text-[10px] uppercase tracking-wider">PIX Copia e Cola</label>
-                            <div id="pixCodeBox" class="font-mono text-[9px] text-brand-300 bg-slate-900 p-3 rounded-xl border border-slate-800 select-all break-all max-h-20 overflow-y-auto text-left"></div>
+                            <div id="pixCodeBox" class="font-mono text-[9px] text-red-400 bg-neutral-950 p-3 rounded-xl border border-neutral-800 select-all break-all max-h-20 overflow-y-auto text-left"></div>
                         </div>
 
-                        <button type="button" onclick="copyPixCode()" class="w-full py-3 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs shadow-lg shadow-brand-600/30 transition flex items-center justify-center space-x-2">
+                        <button type="button" onclick="copyPixCode()" class="w-full py-3 rounded-xl bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:to-rose-500 text-white font-black text-xs shadow-lg shadow-red-600/30 transition flex items-center justify-center space-x-2">
                             <i class="fa-solid fa-copy text-xs"></i>
                             <span>Copiar Código PIX</span>
                         </button>
                     </div>
 
-                    <div class="p-3 rounded-xl bg-slate-950/60 border border-slate-800 text-center space-y-2">
-                        <p class="text-[10px] text-slate-400">Após realizar o PIX no seu banco, o sistema liberará automaticamente em segundos.</p>
+                    <div class="p-3 rounded-xl bg-neutral-950/60 border border-neutral-800 text-center space-y-2">
+                        <p class="text-[10px] text-slate-400">Após realizar o PIX no seu banco, o sistema liberará os títulos automaticamente.</p>
                         <button type="button" onclick="confirmPixPayment()" class="w-full py-2.5 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/40 font-bold rounded-xl text-xs transition flex items-center justify-center space-x-1.5">
                             <i class="fa-solid fa-check-circle text-xs"></i>
                             <span>Verificar Pagamento Agora</span>
-                        </button>
-                    </div>
-
-                    <div class="text-center pt-1">
-                        <button onclick="toggleCheckoutModal(); openSupportModal();" class="text-[10px] text-slate-400 hover:text-emerald-400 transition font-semibold flex items-center justify-center space-x-1 mx-auto">
-                            <i class="fa-solid fa-headset text-xs"></i>
-                            <span>Problemas com o pagamento? Falar com o suporte</span>
                         </button>
                     </div>
                 </div>
 
                 <!-- Error state -->
                 <div id="pixError" class="hidden py-8 text-center space-y-3">
-                    <i class="fa-solid fa-circle-exclamation text-3xl text-amber-500"></i>
+                    <i class="fa-solid fa-circle-exclamation text-3xl text-red-500"></i>
                     <p id="pixErrorMsg" class="text-slate-300 font-semibold text-xs"></p>
-                    <button onclick="proceedToCheckout()" class="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs transition">
+                    <button onclick="proceedToCheckout()" class="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs transition">
                         Tentar novamente
                     </button>
                 </div>
@@ -484,114 +431,12 @@
 
     <!-- Movie Details Modal -->
     <div id="movieDetailsModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
-        <div class="absolute inset-0 bg-slate-950/85 backdrop-blur-md" onclick="closeMovieDetails()"></div>
-        <div class="relative bg-slate-900/95 backdrop-blur-xl border border-slate-800 rounded-2xl max-w-lg w-full p-4 sm:p-6 shadow-2xl z-10 max-h-[85vh] overflow-y-auto">
+        <div class="absolute inset-0 bg-black/85 backdrop-blur-md" onclick="closeMovieDetails()"></div>
+        <div class="relative bg-[#0d0d12]/95 backdrop-blur-xl border border-neutral-800 rounded-2xl max-w-2xl w-full p-4 sm:p-6 shadow-2xl z-10 max-h-[88vh] overflow-y-auto">
             <button onclick="closeMovieDetails()" class="absolute top-3 right-3 text-slate-400 hover:text-white z-20 glass-card p-2 rounded-full"><i class="fa-solid fa-xmark text-xs"></i></button>
             <div id="movieDetailsContent"></div>
         </div>
     </div>
-
-    <!-- Support & FAQ Modal -->
-    <div id="supportModal" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
-        <div class="absolute inset-0 bg-slate-950/85 backdrop-blur-md" onclick="closeSupportModal()"></div>
-        <div class="relative bg-slate-900/95 backdrop-blur-xl border-t sm:border border-slate-800 rounded-t-3xl sm:rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl z-10 max-h-[90vh] overflow-y-auto">
-            <div class="w-10 h-1 bg-slate-700 rounded-full mx-auto mb-3 sm:hidden"></div>
-            
-            <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
-                <div class="flex items-center space-x-2.5">
-                    <div class="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-                        <i class="fa-solid fa-headset text-sm"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-sm font-extrabold text-white">Central de Suporte CineStore</h3>
-                        <span class="text-[10px] text-slate-400">Ajuda com compras, pagamentos e filmes</span>
-                    </div>
-                </div>
-                <button onclick="closeSupportModal()" class="text-slate-400 hover:text-white p-2 rounded-xl glass-card"><i class="fa-solid fa-xmark text-xs"></i></button>
-            </div>
-
-            <div class="space-y-4 text-xs">
-                <!-- Direct Contact Buttons -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                    <a href="https://wa.me/5551999999999?text=Ol%C3%A1%2C%20preciso%20de%20ajuda%20com%20um%20filme%20no%20CineStore" target="_blank" class="p-3 rounded-xl bg-emerald-600/15 hover:bg-emerald-600/25 border border-emerald-500/30 text-emerald-300 font-bold flex items-center space-x-2.5 transition">
-                        <div class="w-7 h-7 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400">
-                            <i class="fa-brands fa-whatsapp text-sm"></i>
-                        </div>
-                        <div>
-                            <div class="text-[11px]">WhatsApp Suporte</div>
-                            <div class="text-[9px] text-slate-400 font-normal">Atendimento imediato</div>
-                        </div>
-                    </a>
-
-                    <a href="mailto:suporte@cinestore.com.br?subject=Ajuda%20com%20Pedido%20CineStore" class="p-3 rounded-xl bg-sky-600/15 hover:bg-sky-600/25 border border-sky-500/30 text-sky-300 font-bold flex items-center space-x-2.5 transition">
-                        <div class="w-7 h-7 rounded-lg bg-sky-500/20 flex items-center justify-center text-sky-400">
-                            <i class="fa-solid fa-envelope text-sm"></i>
-                        </div>
-                        <div>
-                            <div class="text-[11px]">E-mail de Suporte</div>
-                            <div class="text-[9px] text-slate-400 font-normal">suporte@cinestore.com.br</div>
-                        </div>
-                    </a>
-                </div>
-
-                <!-- FAQ Accordion -->
-                <div class="space-y-2">
-                    <h4 class="font-extrabold text-slate-300 text-[11px] uppercase tracking-wider">Perguntas Frequentes (FAQ)</h4>
-                    
-                    <details class="group rounded-xl bg-slate-950/70 border border-slate-800 p-3 open:bg-slate-950 transition cursor-pointer">
-                        <summary class="font-bold text-white text-xs flex justify-between items-center list-none select-none">
-                            <span>Como funciona o pagamento via PIX?</span>
-                            <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 group-open:rotate-180 transition"></i>
-                        </summary>
-                        <p class="text-slate-400 text-[11px] mt-2 leading-relaxed pl-1">
-                            Ao clicar em "Pagar com PIX", nosso sistema gera instantaneamente um QR Code e um código "Copia e Cola" conectado ao gateway PIX seguro. Abra o app do seu banco, cole o código ou aponte a câmera. O sistema reconhece o pagamento e libera os filmes sem você precisar preencher formulários longos.
-                        </p>
-                    </details>
-
-                    <details class="group rounded-xl bg-slate-950/70 border border-slate-800 p-3 open:bg-slate-950 transition cursor-pointer">
-                        <summary class="font-bold text-white text-xs flex justify-between items-center list-none select-none">
-                            <span>Paguei o PIX mas o filme não liberou, o que fazer?</span>
-                            <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 group-open:rotate-180 transition"></i>
-                        </summary>
-                        <p class="text-slate-400 text-[11px] mt-2 leading-relaxed pl-1">
-                            O sistema verifica o pagamento automaticamente a cada poucos segundos. Se houver qualquer instabilidade no banco, você pode clicar no botão <strong>"Verificar Pagamento Agora"</strong> dentro da tela de checkout ou nos contatar via WhatsApp enviando seu comprovante.
-                        </p>
-                    </details>
-
-                    <details class="group rounded-xl bg-slate-950/70 border border-slate-800 p-3 open:bg-slate-950 transition cursor-pointer">
-                        <summary class="font-bold text-white text-xs flex justify-between items-center list-none select-none">
-                            <span>Onde ficam os filmes que eu comprei?</span>
-                            <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 group-open:rotate-180 transition"></i>
-                        </summary>
-                        <p class="text-slate-400 text-[11px] mt-2 leading-relaxed pl-1">
-                            Todos os seus filmes ficam salvos na aba <strong>"Meus Filmes"</strong> no menu superior. Eles ficam disponíveis 24 horas por dia para você assistir quando quiser em qualquer dispositivo.
-                        </p>
-                    </details>
-
-                    <details class="group rounded-xl bg-slate-950/70 border border-slate-800 p-3 open:bg-slate-950 transition cursor-pointer">
-                        <summary class="font-bold text-white text-xs flex justify-between items-center list-none select-none">
-                            <span>Preciso pagar mensalidade ou assinatura?</span>
-                            <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 group-open:rotate-180 transition"></i>
-                        </summary>
-                        <p class="text-slate-400 text-[11px] mt-2 leading-relaxed pl-1">
-                            Não! No CineStore você paga apenas pelos filmes individuais que deseja assistir, sem cobranças recorrentes no seu cartão ou débitos automáticos.
-                        </p>
-                    </details>
-                </div>
-
-                <!-- Status Gateway -->
-                <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between text-[11px]">
-                    <div class="flex items-center space-x-2">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                        <span class="text-slate-300 font-semibold">Gateway PIX 24h:</span>
-                        <span class="text-emerald-400 font-bold">100% Operacional</span>
-                    </div>
-                    <span class="text-slate-500 text-[10px]">Latência ~250ms</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Toast Notification -->
     <div id="toast" class="fixed bottom-4 right-4 z-50 glass-panel border border-slate-700/80 text-slate-100 px-3.5 py-2.5 rounded-xl shadow-xl flex items-center space-x-3 transition-all duration-300 transform translate-y-20 opacity-0 pointer-events-none text-xs">
         <div id="toastIcon" class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
@@ -610,11 +455,8 @@
         const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
         const BACKDROP_BASE_URL = 'https://image.tmdb.org/t/p/original';
 
-        // SyncPay — use client_id e client_secret do seu painel
-        const SYNCPAY_CLIENT_ID     = '0abb8856-0aa3-41fc-8e5c-a8267a0225f9';
-        const SYNCPAY_CLIENT_SECRET = 'e8b118ce-eeb9-413d-a3ac-ecfac6e9c521';
-        // Proxy — funciona em localhost e na Vercel
-        const SYNCPAY_API_URL       = '/api/syncpay';
+        // Mercado Pago API Proxy — funciona em localhost e na Vercel
+        const MP_API_URL            = '/api/mercadopago';
 
         // ─── ESTADO GLOBAL ──────────────────────────────────────────────────────────
         let movies        = [];
@@ -625,8 +467,6 @@
         let searchQuery   = '';
         let authMode      = 'login';
         let currentPixPayload   = '';
-        let syncpayToken        = null;
-        let syncpayTokenExpiry  = null;
         let pendingTransactionId = null;
 
         const genreMap = {
@@ -636,64 +476,27 @@
             10749: "Romance", 878: "Ficção Científica", 53: "Suspense"
         };
 
-        // ─── SYNCPAY AUTH ────────────────────────────────────────────────────────────
-        /**
-         * Obtém (ou reutiliza) o Bearer Token da SyncPay.
-         * O token tem validade de 1 hora; só chama a API quando necessário.
-         */
-        async function getSyncpayToken() {
-            const now = Date.now();
-            // Reutiliza se ainda válido (com 60s de margem)
-            if (syncpayToken && syncpayTokenExpiry && now < syncpayTokenExpiry - 60_000) {
-                return syncpayToken;
-            }
-
-            const res = await fetch(`${SYNCPAY_API_URL}/auth-token`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                body: JSON.stringify({
-                    client_id:     SYNCPAY_CLIENT_ID,
-                    client_secret: SYNCPAY_CLIENT_SECRET
-                })
-            });
-
-            if (!res.ok) {
-                const err = await res.json().catch(() => ({}));
-                throw new Error(err.message || `Erro ao autenticar na SyncPay (${res.status})`);
-            }
-
-            const data = await res.json();
-            syncpayToken  = data.access_token;
-            // expires_in é em segundos
-            syncpayTokenExpiry = now + (data.expires_in || 3600) * 1000;
-            return syncpayToken;
-        }
-
-        // ─── SYNCPAY PIX CASHIN ──────────────────────────────────────────────────────
+        // ─── MERCADO PAGO PIX CASHIN ────────────────────────────────────────────────
         async function createPixCharge(amount) {
-            const token = await getSyncpayToken();
-
-            const res = await fetch(`${SYNCPAY_API_URL}/cash-in`, {
+            const res = await fetch(`${MP_API_URL}/create-pix`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type':  'application/json',
-                    'Accept':        'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Content-Type': 'application/json',
+                    'Accept':       'application/json'
                 },
                 body: JSON.stringify({
                     amount,
-                    description: `CineStore — ${cart.map(m => m.title).join(', ')}`
+                    description: `CineStore - ${cart.map(m => m.title).join(', ')}`
                 })
             });
 
             const data = await res.json();
 
             if (!res.ok) {
-                const errs = data.errors ? Object.values(data.errors).flat().join(' | ') : data.message;
-                throw new Error(errs || `Erro SyncPay (${res.status})`);
+                throw new Error(data.message || `Erro Mercado Pago (${res.status})`);
             }
 
-            return data; // { message, pix_code, identifier }
+            return data; // { id, status, qr_code, qr_code_base64, ticket_url }
         }
 
         // ─── CHECKOUT FLOW ───────────────────────────────────────────────────────────
@@ -715,21 +518,27 @@
             try {
                 const result = await createPixCharge(total);
 
-                currentPixPayload    = result.pix_code;
-                pendingTransactionId = result.identifier;
+                currentPixPayload    = result.qr_code;
+                pendingTransactionId = result.id;
 
                 document.getElementById('pixCodeBox').textContent = currentPixPayload;
-                document.getElementById('pixQrCodeImg').src =
-                    `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(currentPixPayload)}`;
+                
+                // Exibe imagem QR base64 retornada diretamente pelo Mercado Pago ou fallback para gerador de QR
+                if (result.qr_code_base64) {
+                    document.getElementById('pixQrCodeImg').src = `data:image/png;base64,${result.qr_code_base64}`;
+                } else {
+                    document.getElementById('pixQrCodeImg').src =
+                        `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(currentPixPayload)}`;
+                }
 
                 document.getElementById('pixLoading').classList.add('hidden');
                 document.getElementById('pixReady').classList.remove('hidden');
 
                 startPaymentPolling();
             } catch (err) {
-                console.error('[SyncPay]', err);
+                console.error('[MercadoPago]', err);
                 document.getElementById('pixLoading').classList.add('hidden');
-                document.getElementById('pixErrorMsg').textContent = err.message || 'Falha ao gerar PIX. Tente novamente.';
+                document.getElementById('pixErrorMsg').textContent = err.message || 'Falha ao gerar PIX do Mercado Pago. Tente novamente.';
                 document.getElementById('pixError').classList.remove('hidden');
             }
         }
@@ -770,47 +579,45 @@
             document.body.removeChild(ta);
         }
 
-        // ─── VERIFICAÇÃO REAL DO PAGAMENTO ────────────────────────────────────────
+        // ─── VERIFICAÇÃO REAL DO PAGAMENTO MERCADO PAGO ───────────────────────────
         let pollingInterval = null;
 
         /**
-         * Consulta o status da transação na SyncPay.
-         * Retorna 'completed' | 'pending' | 'failed' | ...
+         * Consulta o status do pagamento no Mercado Pago.
+         * Retorna 'approved' | 'pending' | 'in_process' | 'rejected' | 'cancelled'
          */
         async function checkTransactionStatus() {
             if (!pendingTransactionId) return null;
 
             try {
-                const token = await getSyncpayToken();
-                const res = await fetch(`${SYNCPAY_API_URL}/transaction/${pendingTransactionId}`, {
+                const res = await fetch(`${MP_API_URL}/payment/${pendingTransactionId}`, {
                     headers: {
-                        'Accept':        'application/json',
-                        'Authorization': `Bearer ${token}`
+                        'Accept': 'application/json'
                     }
                 });
 
                 if (!res.ok) return null;
                 const data = await res.json();
-                return data?.data?.status || null;
+                return data?.status || null;
             } catch (err) {
-                console.error('[Status Check]', err);
+                console.error('[MercadoPago Status Check]', err);
                 return null;
             }
         }
 
         /**
-         * Inicia o polling automático a cada 5 segundos.
-         * Libera os filmes automaticamente quando o pagamento for confirmado.
+         * Inicia o polling automático a cada 4 segundos.
+         * Libera os filmes automaticamente quando o Mercado Pago confirmar 'approved'.
          */
         function startPaymentPolling() {
             stopPaymentPolling(); // garante que não haja interval duplicado
             pollingInterval = setInterval(async () => {
                 const status = await checkTransactionStatus();
-                if (status === 'completed') {
+                if (status === 'approved') {
                     stopPaymentPolling();
                     finalizePaidOrder();
                 }
-            }, 5000);
+            }, 4000);
         }
 
         function stopPaymentPolling() {
@@ -821,7 +628,7 @@
         }
 
         /**
-         * Botão "Confirmar Pagamento" — verifica na API antes de liberar.
+         * Botão "Confirmar Pagamento" — verifica no Mercado Pago antes de liberar.
          */
         async function confirmPixPayment() {
             if (!pendingTransactionId) {
@@ -829,20 +636,19 @@
                 return;
             }
 
-            showToast('Verificando...', 'Consultando status do pagamento PIX...', 'info');
+            showToast('Verificando...', 'Consultando Mercado Pago PIX...', 'info');
 
             const status = await checkTransactionStatus();
 
-            if (status === 'completed') {
+            if (status === 'approved') {
                 stopPaymentPolling();
-                showToast('PIX Confirmado', 'Pagamento aprovado e liquidado com sucesso!', 'success');
+                showToast('PIX Aprovado', 'Pagamento confirmado com sucesso pelo Mercado Pago!', 'success');
                 finalizePaidOrder();
-            } else if (status === 'pending') {
+            } else if (status === 'pending' || status === 'in_process') {
                 showToast('Aguardando', 'Pagamento ainda não foi detectado. Aguarde e tente novamente.', 'warning');
-            } else if (status === 'failed') {
-                showToast('Falhou', 'O pagamento falhou ou expirou. Gere um novo PIX.', 'warning');
+            } else if (status === 'rejected' || status === 'cancelled') {
+                showToast('Cancelado', 'O pagamento foi recusado ou cancelado. Gere um novo PIX.', 'warning');
                 stopPaymentPolling();
-                resetCheckoutStep();
             } else {
                 showToast('Não confirmado', 'Pagamento ainda não identificado. Realize o PIX no app do seu banco.', 'warning');
             }
@@ -874,14 +680,25 @@
             'Content-Type': 'application/json'
         };
 
+        function getBrokenPrice(id, rating) {
+            // Preços quebrados sempre entre R$ 5,50 e R$ 7,00 (ex: 5,70, 5,90, 6,40, 6,80, 5,50, etc.)
+            const pricePool = [5.50, 5.70, 5.80, 5.90, 6.20, 6.40, 6.50, 6.70, 6.80, 6.90, 7.00];
+            let seed = 0;
+            const str = String(id || '');
+            for (let i = 0; i < str.length; i++) seed += str.charCodeAt(i) * (i + 1);
+            if (rating) seed += Math.floor(parseFloat(rating) * 10);
+            return pricePool[Math.abs(seed) % pricePool.length];
+        }
+
         window.onload = async function() {
             await fetchMovies();
         };
 
         async function fetchMovies() {
-            let userMovies = [];
+            let combinedMovies = [];
+            const seenIds = new Set();
 
-            // Carrega exclusivamente do Supabase (seus filmes e séries cadastrados)
+            // 1. Carrega filmes do Supabase (prioridade do admin)
             try {
                 const res = await fetch(`${SUPABASE_URL}/rest/v1/movies?select=*&order=created_at.desc`, {
                     headers: supabaseHeaders
@@ -890,41 +707,99 @@
                 if (res.ok) {
                     const dbMovies = await res.json();
                     if (Array.isArray(dbMovies) && dbMovies.length > 0) {
-                        userMovies = dbMovies.map(m => ({
-                            id: m.id,
-                            isCustom: true,
-                            title: m.title,
-                            type: m.type || 'movie',
-                            category: m.category || 'Cinema 4K',
-                            genreIds: [],
-                            year: m.year || '2026',
-                            duration: m.duration || (m.type === 'series' ? '1ª Temporada' : '2h 15m'),
-                            rating: m.rating ? parseFloat(m.rating).toFixed(1) : '8.5',
-                            price: parseFloat(m.price || 0) || 24.90,
-                            image: m.image || 'https://placehold.co/600x900/1e293b/ffffff?text=CineStore',
-                            backdrop: m.backdrop || m.image || '',
-                            trailer: m.trailer_url || '',
-                            stream: m.stream_url || '',
-                            description: m.description || 'Uma superprodução imperdível em 4K Ultra HD.',
-                            isFeatured: !!m.is_featured
-                        }));
+                        dbMovies.forEach(m => {
+                            seenIds.add(String(m.id));
+                            combinedMovies.push({
+                                id: String(m.id),
+                                isCustom: true,
+                                title: m.title,
+                                type: m.type || 'movie',
+                                category: m.category || 'Cinema 4K',
+                                genreIds: [],
+                                year: m.year || '2026',
+                                duration: m.duration || (m.type === 'series' ? '1ª Temporada' : '2h 15m'),
+                                rating: m.rating ? parseFloat(m.rating).toFixed(1) : '8.8',
+                                price: getBrokenPrice(m.id, m.rating),
+                                image: m.image || 'https://placehold.co/600x900/18181b/ffffff?text=CineStore',
+                                backdrop: m.backdrop || m.image || '',
+                                trailer: m.trailer_url || '',
+                                stream: m.stream_url || '',
+                                description: m.description || 'Uma superprodução imperdível em 4K Ultra HD com som Dolby Atmos.',
+                                isFeatured: !!m.is_featured
+                            });
+                        });
                     }
                 }
             } catch (dbErr) {
-                console.error('Supabase fetch error:', dbErr);
+                console.warn('Supabase fetch notice:', dbErr);
             }
 
-            movies = userMovies;
+            // 2. Carrega grande catálogo do TMDB (Filmes Populares, Em Alta e Séries)
+            try {
+                const endpoints = [
+                    `${TMDB_BASE_URL}/movie/popular?api_key=${TMDB_API_KEY}&language=pt-BR&page=1`,
+                    `${TMDB_BASE_URL}/movie/popular?api_key=${TMDB_API_KEY}&language=pt-BR&page=2`,
+                    `${TMDB_BASE_URL}/movie/popular?api_key=${TMDB_API_KEY}&language=pt-BR&page=3`,
+                    `${TMDB_BASE_URL}/movie/top_rated?api_key=${TMDB_API_KEY}&language=pt-BR&page=1`,
+                    `${TMDB_BASE_URL}/trending/movie/week?api_key=${TMDB_API_KEY}&language=pt-BR`,
+                    `${TMDB_BASE_URL}/tv/popular?api_key=${TMDB_API_KEY}&language=pt-BR&page=1`,
+                    `${TMDB_BASE_URL}/trending/tv/week?api_key=${TMDB_API_KEY}&language=pt-BR`
+                ];
+
+                const responses = await Promise.allSettled(endpoints.map(url => fetch(url).then(r => r.json())));
+
+                responses.forEach(resp => {
+                    if (resp.status === 'fulfilled' && resp.value && Array.isArray(resp.value.results)) {
+                        resp.value.results.forEach(item => {
+                            if (!item.poster_path) return;
+                            const uniqueKey = `tmdb_${item.id}`;
+                            if (seenIds.has(uniqueKey) || seenIds.has(String(item.id))) return;
+                            seenIds.add(uniqueKey);
+
+                            const isTv = !!item.first_air_date || !!item.name;
+                            const title = item.title || item.name || 'Título CineStore';
+                            const category = item.genre_ids && item.genre_ids.length > 0
+                                ? (genreMap[item.genre_ids[0]] || 'Cinema 4K')
+                                : (isTv ? 'Série' : 'Cinema 4K');
+                            const year = (item.release_date || item.first_air_date || '2025').split('-')[0];
+                            const rating = item.vote_average ? item.vote_average.toFixed(1) : '8.5';
+                            const price = getBrokenPrice(item.id, rating);
+
+                            combinedMovies.push({
+                                id: uniqueKey,
+                                tmdbId: item.id,
+                                isCustom: false,
+                                title: title,
+                                type: isTv ? 'series' : 'movie',
+                                category: category,
+                                genreIds: item.genre_ids || [],
+                                year: year,
+                                duration: isTv ? '1ª Temporada' : '2h 10m',
+                                rating: rating,
+                                price: price,
+                                image: `${IMAGE_BASE_URL}${item.poster_path}`,
+                                backdrop: item.backdrop_path ? `${BACKDROP_BASE_URL}${item.backdrop_path}` : `${IMAGE_BASE_URL}${item.poster_path}`,
+                                trailer: `https://www.youtube.com/results?search_query=${encodeURIComponent(title + ' trailer oficial dublado')}`,
+                                stream: '',
+                                description: item.overview || 'Disponível em 4K Ultra HD com áudio 5.1 Dublado e Legendado.',
+                                isFeatured: item.vote_average >= 8.2 && !isTv
+                            });
+                        });
+                    }
+                });
+            } catch (tmdbErr) {
+                console.error('TMDB fetch error:', tmdbErr);
+            }
+
+            movies = combinedMovies;
 
             if (movies.length > 0) {
                 const featured = movies.find(m => m.isFeatured) || movies[0];
                 setupHero(featured);
                 renderMovies(movies);
             } else {
-                // Se ainda não cadastrou nenhum filme
-                document.getElementById('heroTitle').textContent = 'Catálogo em Atualização';
-                document.getElementById('heroDesc').textContent = 'Novos títulos e lançamentos em 4K estão sendo adicionados em breve.';
-                document.getElementById('heroButtons').innerHTML = '';
+                document.getElementById('heroTitle').textContent = 'CineStore 4K Ultra HD';
+                document.getElementById('heroDesc').textContent = 'Mais de 100 títulos em alta definição com entrega imediata via PIX.';
                 renderMovies([]);
             }
         }
@@ -934,12 +809,12 @@
             document.getElementById('heroTitle').textContent = movie.title;
             document.getElementById('heroDesc').textContent = movie.description;
             document.getElementById('heroButtons').innerHTML = `
-                <button onclick="quickAddMovie('${movie.id}')" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-cyan-500 hover:from-brand-500 hover:to-cyan-400 font-bold text-xs flex items-center space-x-2 shadow-lg shadow-brand-500/25 transition">
+                <button onclick="quickAddMovie('${movie.id}')" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:to-rose-500 font-bold text-xs flex items-center space-x-2 shadow-lg shadow-red-600/30 transition text-white">
                     <i class="fa-solid fa-bag-shopping text-xs"></i>
                     <span>Comprar por R$ ${movie.price.toFixed(2).replace('.', ',')}</span>
                 </button>
-                <button onclick="openMovieDetails('${movie.id}')" class="px-4 py-2.5 rounded-xl glass-card hover:bg-slate-800 font-bold text-xs transition flex items-center space-x-1.5 text-slate-200">
-                    <i class="fa-solid fa-circle-info text-cyan-400"></i>
+                <button onclick="openMovieDetails('${movie.id}')" class="px-4 py-2.5 rounded-xl glass-card hover:bg-neutral-800 hover:border-red-500/40 font-bold text-xs transition flex items-center space-x-1.5 text-slate-200">
+                    <i class="fa-solid fa-circle-info text-red-400"></i>
                     <span>Ver Detalhes & Trailer</span>
                 </button>
             `;
@@ -954,7 +829,7 @@
             if (movieList.length === 0) {
                 grid.innerHTML = `
                     <div class="col-span-full py-16 text-center text-slate-500 space-y-2">
-                        <i class="fa-solid fa-film text-3xl opacity-40 text-brand-400"></i>
+                        <i class="fa-solid fa-film text-3xl opacity-40 text-red-500"></i>
                         <p class="text-xs font-semibold text-slate-300">Nenhum título encontrado.</p>
                         <p class="text-[11px] text-slate-500">Tente buscar por outro termo ou selecione outra categoria.</p>
                     </div>`;
@@ -963,44 +838,44 @@
 
             movieList.forEach(movie => {
                 const card = document.createElement('div');
-                card.className = 'group glass-card rounded-2xl overflow-hidden hover:border-brand-500/50 hover:shadow-xl hover:shadow-brand-500/10 transition duration-300 flex flex-col justify-between';
+                card.className = 'group glass-card rounded-2xl overflow-hidden hover:border-red-500/50 hover:shadow-xl hover:shadow-red-950/40 transition duration-300 flex flex-col justify-between';
                 card.innerHTML = `
                     <div>
-                        <div class="relative aspect-[2/3] overflow-hidden bg-slate-900 cursor-pointer" onclick="openMovieDetails('${movie.id}')">
-                            <img src="${movie.image}" alt="${movie.title}" onerror="this.src='https://placehold.co/600x900/1e293b/ffffff?text=CineStore'" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <div class="relative aspect-[2/3] overflow-hidden bg-neutral-950 cursor-pointer" onclick="openMovieDetails('${movie.id}')">
+                            <img src="${movie.image}" alt="${movie.title}" onerror="this.src='https://placehold.co/600x900/18181b/ffffff?text=CineStore'" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                             
                             <!-- Badges Top -->
-                            <div class="absolute top-2 right-2 bg-slate-950/85 backdrop-blur-md px-1.5 py-0.5 rounded-lg text-[9px] font-bold flex items-center space-x-1 text-amber-400 border border-slate-700/50">
+                            <div class="absolute top-2 right-2 bg-black/85 backdrop-blur-md px-1.5 py-0.5 rounded-lg text-[9px] font-bold flex items-center space-x-1 text-amber-400 border border-neutral-800">
                                 <i class="fa-solid fa-star text-[8px]"></i>
                                 <span>${movie.rating}</span>
                             </div>
                             
                             <div class="absolute top-2 left-2 flex flex-col gap-1">
-                                <span class="bg-gradient-to-r from-brand-600 to-indigo-600 text-white text-[8px] px-2 py-0.5 rounded-md font-extrabold uppercase tracking-wider shadow-md">${movie.category}</span>
-                                ${movie.type === 'series' ? '<span class="bg-cyan-500/90 text-white text-[8px] px-2 py-0.5 rounded-md font-black uppercase tracking-wider">Série</span>' : ''}
+                                <span class="bg-gradient-to-r from-red-600 to-rose-700 text-white text-[8px] px-2 py-0.5 rounded-md font-extrabold uppercase tracking-wider shadow-md shadow-red-950/50">${movie.category}</span>
+                                ${movie.type === 'series' ? '<span class="bg-neutral-900/90 text-red-400 border border-red-500/40 text-[8px] px-2 py-0.5 rounded-md font-black uppercase tracking-wider">Série</span>' : ''}
                             </div>
 
                             <!-- 4K UHD Ribbon -->
-                            <div class="absolute bottom-2 left-2 bg-slate-950/80 backdrop-blur-md px-1.5 py-0.5 rounded text-[8px] font-extrabold text-cyan-400 border border-cyan-500/30">
+                            <div class="absolute bottom-2 left-2 bg-black/80 backdrop-blur-md px-1.5 py-0.5 rounded text-[8px] font-black text-red-400 border border-red-500/30">
                                 4K ULTRA HD
                             </div>
                         </div>
 
                         <div class="p-3">
-                            <h3 onclick="openMovieDetails('${movie.id}')" class="font-extrabold text-xs mb-1 truncate cursor-pointer hover:text-cyan-400 transition text-white">${movie.title}</h3>
+                            <h3 onclick="openMovieDetails('${movie.id}')" class="font-extrabold text-xs mb-1 truncate cursor-pointer hover:text-red-400 transition text-white">${movie.title}</h3>
                             <div class="flex items-center justify-between text-[10px] text-slate-400 mb-1.5 font-medium">
                                 <span>${movie.year}</span>
                                 <span>${movie.duration || '2h 15m'}</span>
                             </div>
                             <div class="text-xs font-black text-white flex items-center justify-between">
-                                <span class="text-cyan-400 font-extrabold">R$ ${movie.price.toFixed(2).replace('.', ',')}</span>
+                                <span class="text-red-500 font-black">R$ ${movie.price.toFixed(2).replace('.', ',')}</span>
                                 <span class="text-[9px] text-slate-500 font-medium">Vitalício</span>
                             </div>
                         </div>
                     </div>
 
                     <div class="p-3 pt-0">
-                        <button onclick="addToCart('${movie.id}')" class="w-full py-2 rounded-xl bg-slate-800/90 hover:bg-gradient-to-r hover:from-brand-600 hover:to-cyan-500 text-slate-200 hover:text-white font-bold text-[10px] flex items-center justify-center space-x-1.5 transition shadow-sm">
+                        <button onclick="addToCart('${movie.id}')" class="w-full py-2 rounded-xl bg-neutral-900 hover:bg-gradient-to-r hover:from-red-600 hover:to-rose-600 border border-neutral-800 hover:border-red-500 text-slate-200 hover:text-white font-bold text-[10px] flex items-center justify-center space-x-1.5 transition shadow-sm">
                             <i class="fa-solid fa-bag-shopping text-[9px]"></i>
                             <span>Adicionar ao Carrinho</span>
                         </button>
@@ -1030,22 +905,22 @@
             document.getElementById('movieDetailsContent').innerHTML = `
                 <div class="space-y-4">
                     <!-- Backdrop Banner -->
-                    <div class="relative rounded-2xl overflow-hidden aspect-[16/9] sm:aspect-[21/9] bg-slate-950 border border-slate-800 shadow-xl group">
+                    <div class="relative rounded-2xl overflow-hidden aspect-[16/9] sm:aspect-[21/9] bg-black border border-neutral-800 shadow-2xl group">
                         <img src="${movie.backdrop || movie.image}" class="w-full h-full object-cover opacity-60 group-hover:scale-105 transition duration-700">
-                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent"></div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
                         
                         <!-- Badges on Backdrop -->
                         <div class="absolute top-3 left-3 flex flex-wrap gap-1.5">
-                            <span class="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider bg-brand-600 text-white shadow-md">
+                            <span class="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider bg-red-600 text-white shadow-md">
                                 ${movie.type === 'series' ? 'Série Completa' : 'Filme 4K'}
                             </span>
-                            <span class="px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase bg-slate-900/90 text-cyan-400 border border-cyan-500/30">
+                            <span class="px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase bg-black/90 text-red-400 border border-red-500/30">
                                 HDR10+ • Dolby Atmos
                             </span>
                         </div>
 
                         <!-- Rating Badge -->
-                        <div class="absolute top-3 right-3 bg-slate-950/90 backdrop-blur-md px-2 py-1 rounded-lg text-[10px] font-extrabold flex items-center space-x-1 text-amber-400 border border-slate-700">
+                        <div class="absolute top-3 right-3 bg-black/90 backdrop-blur-md px-2 py-1 rounded-lg text-[10px] font-extrabold flex items-center space-x-1 text-amber-400 border border-neutral-800">
                             <i class="fa-solid fa-star text-[9px]"></i>
                             <span>${movie.rating} / 10</span>
                         </div>
@@ -1053,18 +928,18 @@
                         <!-- Quick Play / Trailer Button -->
                         ${embedUrl ? `
                             <div class="absolute inset-0 flex items-center justify-center">
-                                <button onclick="playTrailerEmbed('${embedUrl}')" class="w-12 h-12 rounded-full bg-brand-600/90 hover:bg-brand-500 text-white flex items-center justify-center shadow-2xl hover:scale-110 transition group/btn">
+                                <button onclick="playTrailerEmbed('${embedUrl}')" class="w-12 h-12 rounded-full bg-red-600/90 hover:bg-red-500 text-white flex items-center justify-center shadow-2xl hover:scale-110 transition group/btn shadow-red-600/50">
                                     <i class="fa-solid fa-play text-sm ml-0.5 text-white"></i>
                                 </button>
                             </div>
                         ` : ''}
                     </div>
 
-                    <div id="trailerEmbedArea" class="hidden rounded-2xl overflow-hidden aspect-video bg-black border border-slate-800"></div>
+                    <div id="trailerEmbedArea" class="hidden rounded-2xl overflow-hidden aspect-video bg-black border border-neutral-800"></div>
 
                     <!-- Main Info Grid -->
                     <div class="flex flex-col sm:flex-row gap-4">
-                        <div class="w-28 sm:w-36 aspect-[2/3] rounded-xl overflow-hidden bg-slate-900 flex-shrink-0 mx-auto sm:mx-0 shadow-xl border border-slate-800">
+                        <div class="w-28 sm:w-36 aspect-[2/3] rounded-xl overflow-hidden bg-neutral-950 flex-shrink-0 mx-auto sm:mx-0 shadow-xl border border-neutral-800">
                             <img src="${movie.image}" class="w-full h-full object-cover">
                         </div>
 
@@ -1075,24 +950,24 @@
                                     <span>•</span>
                                     <span>${movie.duration || '2h 15m'}</span>
                                     <span>•</span>
-                                    <span class="text-cyan-400 font-semibold">${movie.category}</span>
+                                    <span class="text-red-400 font-semibold">${movie.category}</span>
                                 </div>
                                 <h2 class="text-lg sm:text-xl font-black text-white tracking-tight">${movie.title}</h2>
                                 <p class="text-slate-300 text-xs leading-relaxed mt-2 line-clamp-4 sm:line-clamp-none">${movie.description}</p>
                             </div>
 
                             <!-- Tech Specs -->
-                            <div class="grid grid-cols-3 gap-2 py-2 border-y border-slate-800/80 text-[10px] text-center">
-                                <div class="p-1.5 rounded-lg bg-slate-950 border border-slate-800">
-                                    <span class="block text-slate-500 font-bold">QUALIDADE</span>
+                            <div class="grid grid-cols-3 gap-2 py-2 border-y border-neutral-800/80 text-[10px] text-center">
+                                <div class="p-1.5 rounded-lg bg-black border border-neutral-800">
+                                    <span class="block text-neutral-500 font-bold">QUALIDADE</span>
                                     <span class="font-black text-white">4K UHD</span>
                                 </div>
-                                <div class="p-1.5 rounded-lg bg-slate-950 border border-slate-800">
-                                    <span class="block text-slate-500 font-bold">ÁUDIO</span>
-                                    <span class="font-black text-cyan-400">5.1 Dub / Leg</span>
+                                <div class="p-1.5 rounded-lg bg-black border border-neutral-800">
+                                    <span class="block text-neutral-500 font-bold">ÁUDIO</span>
+                                    <span class="font-black text-red-400">5.1 Dub / Leg</span>
                                 </div>
-                                <div class="p-1.5 rounded-lg bg-slate-950 border border-slate-800">
-                                    <span class="block text-slate-500 font-bold">ACESSO</span>
+                                <div class="p-1.5 rounded-lg bg-black border border-neutral-800">
+                                    <span class="block text-neutral-500 font-bold">ACESSO</span>
                                     <span class="font-black text-emerald-400">Vitalício</span>
                                 </div>
                             </div>
@@ -1100,7 +975,7 @@
                     </div>
 
                     <!-- Footer / Purchase Actions -->
-                    <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-slate-800">
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-neutral-800">
                         <div>
                             <span class="block text-[9px] text-slate-400 uppercase font-bold">Preço com PIX Instantâneo</span>
                             <div class="flex items-baseline space-x-1.5">
@@ -1111,12 +986,12 @@
 
                         <div class="flex items-center space-x-2 w-full sm:w-auto">
                             ${movie.trailer && !embedUrl ? `
-                                <a href="${movie.trailer}" target="_blank" class="px-3.5 py-2.5 rounded-xl glass-card hover:bg-slate-800 text-slate-300 hover:text-white font-bold text-xs transition flex items-center space-x-1.5">
+                                <a href="${movie.trailer}" target="_blank" class="px-3.5 py-2.5 rounded-xl glass-card hover:bg-neutral-800 text-slate-300 hover:text-white font-bold text-xs transition flex items-center space-x-1.5">
                                     <i class="fa-brands fa-youtube text-red-500 text-xs"></i>
                                     <span>Trailer</span>
                                 </a>
                             ` : ''}
-                            <button onclick="quickAddMovie('${movie.id}'); closeMovieDetails();" class="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-cyan-500 hover:from-brand-500 hover:to-cyan-400 text-white font-bold text-xs shadow-lg shadow-brand-500/25 transition flex items-center justify-center space-x-2">
+                            <button onclick="quickAddMovie('${movie.id}'); closeMovieDetails();" class="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:to-rose-500 text-white font-bold text-xs shadow-lg shadow-red-600/30 transition flex items-center justify-center space-x-2">
                                 <i class="fa-solid fa-bolt text-xs"></i>
                                 <span>Comprar Agora</span>
                             </button>
@@ -1140,16 +1015,15 @@
             document.getElementById('movieDetailsModal').classList.add('hidden');
         }
 
-
         // ─── FILTROS ─────────────────────────────────────────────────────────────────
         function filterCategory(genreKey) {
             currentGenre = genreKey;
             document.querySelectorAll('.cat-btn').forEach(btn => {
                 const active = btn.getAttribute('onclick').includes(`'${genreKey}'`) || btn.getAttribute('onclick').includes(`"${genreKey}"`);
                 if (active) {
-                    btn.className = 'cat-btn flex items-center space-x-1.5 px-3.5 py-2 rounded-xl font-extrabold text-xs bg-gradient-to-r from-brand-600 via-indigo-600 to-cyan-500 text-white shadow-lg shadow-brand-500/25 transition whitespace-nowrap flex-shrink-0 scale-100';
+                    btn.className = 'cat-btn flex items-center space-x-1.5 px-3.5 py-2 rounded-xl font-extrabold text-xs bg-gradient-to-r from-red-600 via-rose-600 to-red-700 text-white shadow-lg shadow-red-600/30 transition whitespace-nowrap flex-shrink-0 scale-100';
                 } else {
-                    btn.className = 'cat-btn flex items-center space-x-1.5 px-3.5 py-2 rounded-xl font-bold text-xs glass-card text-slate-300 hover:text-white hover:bg-slate-800 transition whitespace-nowrap flex-shrink-0';
+                    btn.className = 'cat-btn flex items-center space-x-1.5 px-3.5 py-2 rounded-xl font-bold text-xs glass-card text-slate-300 hover:text-white hover:bg-neutral-800 transition whitespace-nowrap flex-shrink-0';
                 }
             });
 
@@ -1278,47 +1152,6 @@
             total.textContent = `R$ ${sum.toFixed(2).replace('.', ',')}`;
         }
 
-        // ─── DETALHES DO FILME ───────────────────────────────────────────────────────
-        function openMovieDetails(movieId) {
-            const movie = movies.find(m => m.id === movieId);
-            if (!movie) return;
-
-            document.getElementById('movieDetailsContent').innerHTML = `
-                <div class="flex flex-col sm:flex-row gap-4">
-                    <div class="w-32 sm:w-40 aspect-[2/3] rounded-xl overflow-hidden bg-slate-900 flex-shrink-0 mx-auto shadow-lg border border-slate-800">
-                        <img src="${movie.image}" class="w-full h-full object-cover">
-                    </div>
-                    <div class="flex-1 flex flex-col justify-between text-xs sm:text-sm">
-                        <div>
-                            <div class="flex items-center space-x-2 mb-2">
-                                <span class="px-2 py-0.5 bg-brand-600 text-white text-[9px] font-bold rounded uppercase">${movie.category}</span>
-                                <div class="flex items-center space-x-1 text-amber-400 glass-card px-2 py-0.5 rounded text-[9px] font-bold">
-                                    <i class="fa-solid fa-star"></i><span>${movie.rating}</span>
-                                </div>
-                            </div>
-                            <h2 class="text-base sm:text-lg font-extrabold mb-1.5 text-white">${movie.title}</h2>
-                            <p class="text-slate-300 text-xs leading-relaxed mb-3">${movie.description}</p>
-                        </div>
-                        <div class="flex items-center justify-between pt-3 border-t border-slate-800">
-                            <div>
-                                <span class="block text-[8px] text-slate-400 uppercase font-bold">Preço 4K</span>
-                                <span class="text-sm sm:text-base font-black text-white">R$ ${movie.price.toFixed(2).replace('.', ',')}</span>
-                            </div>
-                            <button onclick="quickAddMovie(${movie.id}); closeMovieDetails();" class="px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs shadow-md transition flex items-center space-x-1">
-                                <i class="fa-solid fa-bag-shopping text-[10px]"></i>
-                                <span>Comprar</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.getElementById('movieDetailsModal').classList.remove('hidden');
-        }
-
-        function closeMovieDetails() {
-            document.getElementById('movieDetailsModal').classList.add('hidden');
-        }
-
         // ─── BIBLIOTECA ──────────────────────────────────────────────────────────────
         function showMyLibrary() {
             const grid = document.getElementById('movieGrid');
@@ -1362,7 +1195,7 @@
             });
         }
 
-        // ─── NAVEGAÇÃO & SUPORTE ───────────────────────────────────────────────────
+        // ─── NAVEGAÇÃO ──────────────────────────────────────────────────────────────
         function navigateTo(target) {
             if (target === 'home') {
                 document.getElementById('catalogTitle').textContent = 'Catálogo de Filmes';
@@ -1379,16 +1212,6 @@
             if (el) {
                 el.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
-        }
-
-        function openSupportModal() {
-            const modal = document.getElementById('supportModal');
-            if (modal) modal.classList.remove('hidden');
-        }
-
-        function closeSupportModal() {
-            const modal = document.getElementById('supportModal');
-            if (modal) modal.classList.add('hidden');
         }
 
         // ─── TOAST ───────────────────────────────────────────────────────────────────
