@@ -118,16 +118,48 @@
     <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full space-y-6">
         
         <!-- Hero Section -->
-        <section id="heroSection" class="relative rounded-3xl overflow-hidden glass-panel border border-red-900/30 p-5 sm:p-8 md:p-10 shadow-2xl min-h-[320px] flex flex-col justify-end">
-            <div id="heroBg" class="absolute inset-0 opacity-25 bg-cover bg-center transition-all duration-700"></div>
-            <div class="absolute inset-0 bg-gradient-to-t from-[#070709] via-[#070709]/70 to-transparent"></div>
-            <div class="relative z-10 max-w-lg" id="heroContent">
-                <span class="inline-block px-3 py-1 rounded-full bg-red-600/20 text-red-400 border border-red-500/40 text-[10px] font-bold uppercase tracking-wider mb-2 shadow-sm">
-                    Destaque Cinema 4K
-                </span>
-                <h1 id="heroTitle" class="text-xl sm:text-3xl font-black tracking-tight mb-2 text-white">Carregando...</h1>
-                <p id="heroDesc" class="text-slate-300 text-xs sm:text-sm mb-4 leading-relaxed line-clamp-2">Buscando os melhores lançamentos em tempo real...</p>
-                <div class="flex flex-wrap gap-2.5" id="heroButtons"></div>
+        <section id="heroSection" class="relative rounded-3xl overflow-hidden glass-panel border border-red-900/40 p-4 sm:p-7 md:p-8 shadow-2xl min-h-[360px] sm:min-h-[420px] flex items-end">
+            <div id="heroBg" class="absolute inset-0 opacity-40 bg-cover bg-center transition-all duration-700 filter brightness-90"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-[#070709] via-[#070709]/80 to-transparent"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-[#070709] via-[#070709]/75 to-transparent"></div>
+            
+            <div class="relative z-10 w-full flex flex-col md:flex-row md:items-end justify-between gap-6" id="heroContent">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 max-w-3xl">
+                    <!-- Movie Image in Banner -->
+                    <div id="heroPosterWrapper" class="w-28 sm:w-36 md:w-44 aspect-[2/3] rounded-2xl overflow-hidden shadow-2xl shadow-red-950/80 border-2 border-red-500/60 flex-shrink-0 group cursor-pointer relative transition-transform hover:scale-105 duration-300" onclick="if(currentHeroMovie) openMovieDetails(currentHeroMovie.id)">
+                        <img id="heroPosterImg" src="" alt="Destaque" class="w-full h-full object-cover">
+                        <div class="absolute top-2 left-2 bg-gradient-to-r from-red-600 to-rose-700 text-white text-[8px] font-black px-2 py-0.5 rounded-md shadow-md uppercase tracking-wider">4K ULTRA HD</div>
+                        <div class="absolute bottom-2 right-2 bg-black/90 text-amber-400 border border-neutral-800 text-[9px] font-black px-2 py-0.5 rounded-md shadow flex items-center gap-1">
+                            <i class="fa-solid fa-star text-[8px]"></i>
+                            <span id="heroRating">8.8</span>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-2.5">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="px-2.5 py-1 rounded-lg bg-red-600/30 text-red-400 border border-red-500/50 text-[10px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1">
+                                <i class="fa-solid fa-fire text-[10px]"></i> Destaque da Semana
+                            </span>
+                            <span class="px-2.5 py-1 rounded-lg bg-gradient-to-r from-amber-500/20 to-red-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-black uppercase tracking-wider animate-pulse flex items-center gap-1">
+                                🔥 SUPER PROMOÇÃO R$ 1,50
+                            </span>
+                        </div>
+
+                        <h1 id="heroTitle" class="text-2xl sm:text-4xl font-black tracking-tight text-white drop-shadow-lg leading-tight">Carregando...</h1>
+                        
+                        <p id="heroDesc" class="text-slate-300 text-xs sm:text-sm leading-relaxed line-clamp-2 sm:line-clamp-3">Buscando os melhores lançamentos em tempo real...</p>
+                        
+                        <div class="flex flex-wrap items-baseline gap-2 pt-1">
+                            <span class="text-xs text-slate-400 line-through font-semibold">De R$ 24,90</span>
+                            <span class="text-2xl sm:text-3xl font-black text-red-500">Por R$ 1,50</span>
+                            <span class="text-[10px] text-emerald-400 font-extrabold bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/30 flex items-center gap-1">
+                                <i class="fa-solid fa-bolt"></i> PIX Instantâneo
+                            </span>
+                        </div>
+
+                        <div class="flex flex-wrap gap-2.5 pt-1.5" id="heroButtons"></div>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -459,10 +491,12 @@
         const MP_API_URL            = '/api/mercadopago';
 
         // ─── ESTADO GLOBAL ──────────────────────────────────────────────────────────
+        const PROMO_PRICE = 1.50;
         let movies        = [];
         let cart          = [];
         let userLibrary   = [];
         let currentUser   = null;
+        let currentHeroMovie = null;
         let currentGenre  = 'all';
         let searchQuery   = '';
         let authMode      = 'login';
@@ -719,7 +753,8 @@
                                 year: m.year || '2026',
                                 duration: m.duration || (m.type === 'series' ? '1ª Temporada' : '2h 15m'),
                                 rating: m.rating ? parseFloat(m.rating).toFixed(1) : '8.8',
-                                price: getBrokenPrice(m.id, m.rating),
+                                price: PROMO_PRICE,
+                                originalPrice: 24.90,
                                 image: m.image || 'https://placehold.co/600x900/18181b/ffffff?text=CineStore',
                                 backdrop: m.backdrop || m.image || '',
                                 trailer: m.trailer_url || '',
@@ -763,7 +798,6 @@
                                 : (isTv ? 'Série' : 'Cinema 4K');
                             const year = (item.release_date || item.first_air_date || '2025').split('-')[0];
                             const rating = item.vote_average ? item.vote_average.toFixed(1) : '8.5';
-                            const price = getBrokenPrice(item.id, rating);
 
                             combinedMovies.push({
                                 id: uniqueKey,
@@ -776,7 +810,8 @@
                                 year: year,
                                 duration: isTv ? '1ª Temporada' : '2h 10m',
                                 rating: rating,
-                                price: price,
+                                price: PROMO_PRICE,
+                                originalPrice: 24.90,
                                 image: `${IMAGE_BASE_URL}${item.poster_path}`,
                                 backdrop: item.backdrop_path ? `${BACKDROP_BASE_URL}${item.backdrop_path}` : `${IMAGE_BASE_URL}${item.poster_path}`,
                                 trailer: `https://www.youtube.com/results?search_query=${encodeURIComponent(title + ' trailer oficial dublado')}`,
@@ -799,21 +834,33 @@
                 renderMovies(movies);
             } else {
                 document.getElementById('heroTitle').textContent = 'CineStore 4K Ultra HD';
-                document.getElementById('heroDesc').textContent = 'Mais de 100 títulos em alta definição com entrega imediata via PIX.';
+                document.getElementById('heroDesc').textContent = 'Mais de 100 títulos em alta definição com entrega imediata via PIX por apenas R$ 1,50.';
                 renderMovies([]);
             }
         }
 
         function setupHero(movie) {
+            currentHeroMovie = movie;
             if (movie.backdrop) document.getElementById('heroBg').style.backgroundImage = `url('${movie.backdrop}')`;
             document.getElementById('heroTitle').textContent = movie.title;
             document.getElementById('heroDesc').textContent = movie.description;
+            
+            const posterImg = document.getElementById('heroPosterImg');
+            if (posterImg) {
+                posterImg.src = movie.image;
+                posterImg.alt = movie.title;
+            }
+            const ratingEl = document.getElementById('heroRating');
+            if (ratingEl) {
+                ratingEl.textContent = movie.rating || '8.8';
+            }
+
             document.getElementById('heroButtons').innerHTML = `
-                <button onclick="quickAddMovie('${movie.id}')" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:to-rose-500 font-bold text-xs flex items-center space-x-2 shadow-lg shadow-red-600/30 transition text-white">
-                    <i class="fa-solid fa-bag-shopping text-xs"></i>
-                    <span>Comprar por R$ ${movie.price.toFixed(2).replace('.', ',')}</span>
+                <button onclick="quickAddMovie('${movie.id}')" class="px-5 py-3 rounded-xl bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:to-rose-500 font-black text-xs sm:text-sm flex items-center space-x-2 shadow-xl shadow-red-600/40 transition text-white hover:scale-105 transform">
+                    <i class="fa-solid fa-bolt text-xs"></i>
+                    <span>Comprar por R$ 1,50 (Promoção)</span>
                 </button>
-                <button onclick="openMovieDetails('${movie.id}')" class="px-4 py-2.5 rounded-xl glass-card hover:bg-neutral-800 hover:border-red-500/40 font-bold text-xs transition flex items-center space-x-1.5 text-slate-200">
+                <button onclick="openMovieDetails('${movie.id}')" class="px-4 py-3 rounded-xl glass-card hover:bg-neutral-800 hover:border-red-500/40 font-bold text-xs transition flex items-center space-x-1.5 text-slate-200">
                     <i class="fa-solid fa-circle-info text-red-400"></i>
                     <span>Ver Detalhes & Trailer</span>
                 </button>
@@ -868,8 +915,11 @@
                                 <span>${movie.duration || '2h 15m'}</span>
                             </div>
                             <div class="text-xs font-black text-white flex items-center justify-between">
-                                <span class="text-red-500 font-black">R$ ${movie.price.toFixed(2).replace('.', ',')}</span>
-                                <span class="text-[9px] text-slate-500 font-medium">Vitalício</span>
+                                <div class="flex items-baseline space-x-1">
+                                    <span class="line-through text-slate-500 text-[10px]">R$ 24,90</span>
+                                    <span class="text-red-500 font-black text-sm">R$ ${movie.price.toFixed(2).replace('.', ',')}</span>
+                                </div>
+                                <span class="text-[8px] font-black text-amber-300 bg-amber-500/20 border border-amber-500/40 px-1.5 py-0.5 rounded uppercase">🔥 PROMO</span>
                             </div>
                         </div>
                     </div>
@@ -877,7 +927,7 @@
                     <div class="p-3 pt-0">
                         <button onclick="addToCart('${movie.id}')" class="w-full py-2 rounded-xl bg-neutral-900 hover:bg-gradient-to-r hover:from-red-600 hover:to-rose-600 border border-neutral-800 hover:border-red-500 text-slate-200 hover:text-white font-bold text-[10px] flex items-center justify-center space-x-1.5 transition shadow-sm">
                             <i class="fa-solid fa-bag-shopping text-[9px]"></i>
-                            <span>Adicionar ao Carrinho</span>
+                            <span>Adicionar • R$ 1,50</span>
                         </button>
                     </div>
                 `;
@@ -914,8 +964,8 @@
                             <span class="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider bg-red-600 text-white shadow-md">
                                 ${movie.type === 'series' ? 'Série Completa' : 'Filme 4K'}
                             </span>
-                            <span class="px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase bg-black/90 text-red-400 border border-red-500/30">
-                                HDR10+ • Dolby Atmos
+                            <span class="px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase bg-black/90 text-amber-400 border border-amber-500/40">
+                                🔥 PROMOÇÃO R$ 1,50
                             </span>
                         </div>
 
@@ -977,9 +1027,10 @@
                     <!-- Footer / Purchase Actions -->
                     <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-neutral-800">
                         <div>
-                            <span class="block text-[9px] text-slate-400 uppercase font-bold">Preço com PIX Instantâneo</span>
-                            <div class="flex items-baseline space-x-1.5">
-                                <span class="text-lg sm:text-xl font-black text-white">R$ ${movie.price.toFixed(2).replace('.', ',')}</span>
+                            <span class="block text-[9px] text-slate-400 uppercase font-bold">Preço Promocional PIX</span>
+                            <div class="flex items-baseline space-x-2">
+                                <span class="text-xs text-slate-500 line-through font-semibold">De R$ 24,90</span>
+                                <span class="text-xl sm:text-2xl font-black text-red-500">Por R$ 1,50</span>
                                 <span class="text-[10px] text-emerald-400 font-semibold">• Sem mensalidades</span>
                             </div>
                         </div>
@@ -993,7 +1044,7 @@
                             ` : ''}
                             <button onclick="quickAddMovie('${movie.id}'); closeMovieDetails();" class="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:to-rose-500 text-white font-bold text-xs shadow-lg shadow-red-600/30 transition flex items-center justify-center space-x-2">
                                 <i class="fa-solid fa-bolt text-xs"></i>
-                                <span>Comprar Agora</span>
+                                <span>Comprar por R$ 1,50</span>
                             </button>
                         </div>
                     </div>
